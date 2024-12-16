@@ -44,6 +44,9 @@ public class BuggyAList<Item> {
 
     /** Returns the item from the back of the list. */
     public Item getLast() {
+        if (size == 0) {
+            throw new IndexOutOfBoundsException("List is empty");
+        }
         return items[size - 1];
     }
     /** Gets the ith item in the list (0 is the front). */
@@ -59,9 +62,11 @@ public class BuggyAList<Item> {
     /** Deletes item from back of the list and
       * returns deleted item. */
     public Item removeLast() {
-        if ((size < items.length / 4) && (size > 4)) {
-            resize(size / 4);
+        if (size == 0) {
+            throw new IndexOutOfBoundsException("List is empty");
         }
+        if (size <= items.length / 4 && size > 1) { // Changed condition to avoid resizing to too small size
+            resize(Math.max(size / 2, 4));}
         Item x = getLast();
         items[size - 1] = null;
         size = size - 1;
