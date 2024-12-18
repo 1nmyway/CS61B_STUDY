@@ -5,7 +5,7 @@ import org.w3c.dom.Node;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class LinkedListDeque<Item>  {
+public class LinkedListDeque<Item> implements Deque<Item>{
     private class IntNode {
         public Item item;
         public IntNode next;
@@ -72,6 +72,7 @@ public class LinkedListDeque<Item>  {
             IntNode firstNode = sentinel.next;
             sentinel.next = firstNode.next;
             firstNode.next.prev = sentinel;
+            size--;
             return firstNode.item;
         }
         return null;
@@ -79,10 +80,11 @@ public class LinkedListDeque<Item>  {
 
     public Item removeLast(){
         if (!isEmpty()){
-        sentinel.prev.prev.next=sentinel;
-        sentinel.prev=sentinel.prev.prev;
-        size--;
-        return sentinel.prev.item;
+            IntNode lastNode = sentinel.prev;
+            lastNode.prev.next=sentinel;
+            sentinel.prev=lastNode.prev;
+            size--;
+            return lastNode.item;
         }
         return null;
     }
@@ -169,6 +171,16 @@ public class LinkedListDeque<Item>  {
     }
     public Iterator<Item> iterator() {
         return new DequeIterator<Item>();
+    }
+    public void printDeque() {
+        if (isEmpty()) {
+            return; // 或者抛出一个异常，取决于你的需求
+        }
+        DequeIterator<Item> iterator = new DequeIterator<>();
+        while (iterator.hasNext()) {
+
+            System.out.println(iterator.next()); // 移动到下一个节点
+        }
     }
 //    public static void main(String[] args) {
 //        LinkedListDeque<Integer> L = new LinkedListDeque<>();
