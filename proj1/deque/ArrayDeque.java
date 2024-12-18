@@ -2,32 +2,29 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Deque<T>{
-    T items[];
+public class ArrayDeque<Item> implements Deque<Item>{
+    Item items[];
     int size;
     static int actualSize=8;
     public ArrayDeque(){
-        items = (T[]) new Object[8];
+        items = (Item[]) new Object[8];
         size = 0;
     }
-    public void addLast(T item) {
+    public void addLast(Item item) {
         if (size == items.length) {
             if (size>=100){
             resize((int) (size * 1.01));
-            actualSize = (int) (size * 1.01);
             }
             else{
                 resize(size * 2);
-                actualSize = (int) (size * 2);
             }
 
         }
         items[size] = item;
         size++;
     }
-    public void addFirst(T item){
-        firstResize(size+1);
-        actualSize++;
+    public void addFirst(Item item){
+        addFirstResize(size+1);
         items[0]=item;
         size++;
 
@@ -37,15 +34,17 @@ public class ArrayDeque<T> implements Deque<T>{
             return true;
         return false;
     }
-    public void firstResize(int capacity){
-        T[] a = (T[]) new Object[capacity];
+    public void addFirstResize(int capacity){
+        Item[] a = (Item[]) new Object[capacity];
         System.arraycopy(items, 0, a, 1, size);
         items = a;
+        actualSize=capacity;
     }
     public void resize(int capacity){
-    T[] a = (T[]) new Object[capacity];
+        Item[] a = (Item[]) new Object[capacity];
     System.arraycopy(items, 0, a, 0, size);
     items = a;
+    actualSize=capacity;
     }
     public int size(){
         return size;
@@ -55,37 +54,42 @@ public class ArrayDeque<T> implements Deque<T>{
             System.out.println(items[i]);
         }
     }
-    public T removeFirst() {
+    public Item removeFirst() {
         if (!isEmpty()) {
-            T x = items[0];
-            items[0] = null;
+            Item x = items[0];
+            removeFirstResize(size);
             size--;
             return x;
         }
         return null;
     }
-    public T removeLast(){
+    public void removeFirstResize(int capacity){
+        Item[] a = (Item[]) new Object[capacity];
+        System.arraycopy(items, 1, a, 0, size-1);
+        items = a;
+        actualSize=capacity;
+    }
+    public Item removeLast(){
         if (!isEmpty()) {
             if((double)size/actualSize<0.25){
                 resize((int)(actualSize/2));
-                actualSize = (int)(actualSize/2);
             }
-            T x = getLast();
+            Item x = getLast();
             items[size - 1] = null;
             size--;
             return x;
         }
         return null;
     }
-    public T get(int index){
-        if (!isEmpty())
+    public Item get(int index){
+        if (!isEmpty()&&index<size)
             return items[index];
         return null;
     }
-    public T getLast(){
+    public Item getLast(){
         return items[size-1];
     }
-    public Iterator<T> iterator() {
+    public Iterator<Item> iterator() {
         return new ArrayDequeIterator();
     }
 
@@ -112,7 +116,7 @@ public class ArrayDeque<T> implements Deque<T>{
         return true;
     }
 
-    private class ArrayDequeIterator implements Iterator<T> {
+    private class ArrayDequeIterator implements Iterator<Item> {
         private int index;
 
         ArrayDequeIterator() {
@@ -123,8 +127,8 @@ public class ArrayDeque<T> implements Deque<T>{
             return index < size;
         }
 
-        public T next() {
-            T item = get(index);
+        public Item next() {
+            Item item = get(index);
             index += 1;
             return item;
         }
@@ -132,25 +136,13 @@ public class ArrayDeque<T> implements Deque<T>{
 
 //    public static void main(String[] args) {
 //        ArrayDeque<Integer> L = new ArrayDeque<>();
-//        L.addLast(10);
 //        L.addLast(20);
 //        L.addLast(30);
-//        L.addLast(40);
-//        L.addLast(50);
-//        L.addLast(50);
-//        L.addLast(50);
-//        L.addLast(50);
-//        L.addLast(50);
+//        L.addFirst(10);
+//        L.removeFirst();
+//        L.isEmpty();
 //
-//       L.removeLast();
-//        L.removeLast();
-//        L.removeLast();
-//        L.removeLast();
-//        L.removeLast();
-//        L.removeLast();
-//        L.removeLast();
-//
-//        System.out.println(L.get(0)+" "+actualSize+" "+L.size());
+//        System.out.println(L.size()+" "+L.get(0)+" "+L.get(1)+" "+L.get(2)+" "+L.size());
 //    }
 
 }

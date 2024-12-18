@@ -98,9 +98,9 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     public Item getRecursive(int index){
         return getRecursive2(sentinel,index);
     }
-    public Item getRecursive2(IntNode p,int index){
+    private Item getRecursive2(IntNode p,int index){
 
-        if (index==0)
+        if (index==-1)
             return p.item;
         return getRecursive2(p.next,index-1);
     }
@@ -145,26 +145,41 @@ public class LinkedListDeque<Item> implements Deque<Item>{
 
     public boolean equals(Object o) {
         // 检查对象是否为当前类的实例
-        if (!(o instanceof LinkedListDeque<?>)) {
-            return false;
-        }
+        if (o instanceof ArrayDeque<?>) {
+            ArrayDeque<?> other = (ArrayDeque<?>) o;
 
-        // 类型转换
-        LinkedListDeque<?> other = (LinkedListDeque<?>) o;
-
-        // 如果两个队列大小不同，则它们不可能相等
-        if (this.size() != other.size()) {
-            return false;
-        }
-
-        // 使用迭代器遍历两个队列，并比较每个元素
-        Iterator<Item> thisIterator = this.iterator();
-        Iterator<?> otherIterator = other.iterator();
-
-        while (thisIterator.hasNext() && otherIterator.hasNext()) {
-            // 如果在任何位置元素不相等，则返回 false
-            if (!thisIterator.next().equals(otherIterator.next())) {
+            // 如果两个队列大小不同，则它们不可能相等
+            if (this.size() != other.size()) {
                 return false;
+            }
+
+            // 使用迭代器遍历两个队列，并比较每个元素
+            Iterator<Item> thisIterator = this.iterator();
+            Iterator<?> otherIterator = other.iterator();
+
+            while (thisIterator.hasNext() && otherIterator.hasNext()) {
+                // 如果在任何位置元素不相等，则返回 false
+                if (!thisIterator.next().equals(otherIterator.next())) {
+                    return false;
+                }
+            }
+        }else{
+            LinkedListDeque<?> other = (LinkedListDeque<?>) o;
+
+            // 如果两个队列大小不同，则它们不可能相等
+            if (this.size() != other.size()) {
+                return false;
+            }
+
+            // 使用迭代器遍历两个队列，并比较每个元素
+            Iterator<Item> thisIterator = this.iterator();
+            Iterator<?> otherIterator = other.iterator();
+
+            while (thisIterator.hasNext() && otherIterator.hasNext()) {
+                // 如果在任何位置元素不相等，则返回 false
+                if (!thisIterator.next().equals(otherIterator.next())) {
+                    return false;
+                }
             }
         }
         return true;
@@ -184,15 +199,18 @@ public class LinkedListDeque<Item> implements Deque<Item>{
     }
 //    public static void main(String[] args) {
 //        LinkedListDeque<Integer> L = new LinkedListDeque<>();
+//        ArrayDeque<Integer> A = new ArrayDeque<>();
+//        L.addLast(20);
+//        A.addLast(20);
 //
-//       L.addLast(20);
-//        LinkedListDeque<Integer> L2= new LinkedListDeque<>();
+//        LinkedListDeque<Integer> L2 = new LinkedListDeque<>();
+//        L2.addLast(201);
 //
-//        L2.addLast(20);
+//
 //
 //
 ////        L.getLast();
-//        System.out.println(L.equals(L2));
+//        System.out.println(L.equals(A));
 //    }
 }
 
