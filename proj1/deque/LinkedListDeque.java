@@ -2,6 +2,7 @@ package deque;
 
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -163,7 +164,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
                     return false;
                 }
             }
-        }else{
+        }else if(o instanceof LinkedListDeque<?>){
             LinkedListDeque<?> other = (LinkedListDeque<?>) o;
 
             // 如果两个队列大小不同，则它们不可能相等
@@ -181,6 +182,8 @@ public class LinkedListDeque<Item> implements Deque<Item>{
                     return false;
                 }
             }
+        }else{
+            return false;
         }
         return true;
     }
@@ -197,20 +200,22 @@ public class LinkedListDeque<Item> implements Deque<Item>{
             System.out.println(iterator.next()); // 移动到下一个节点
         }
     }
-//    public static void main(String[] args) {
-//        LinkedListDeque<Integer> L = new LinkedListDeque<>();
-//        ArrayDeque<Integer> A = new ArrayDeque<>();
-//        L.addLast(20);
-//        A.addLast(20);
-//
-//        LinkedListDeque<Integer> L2 = new LinkedListDeque<>();
-//        L2.addLast(201);
-//
-//
-//
-//
-////        L.getLast();
-//        System.out.println(L.equals(A));
-//    }
+    public static void main(String[] args) {
+        LinkedListDeque<Integer> L = new LinkedListDeque<>();
+        ArrayDeque<Integer> A = new ArrayDeque<>();
+        ArrayList<Integer> b = new ArrayList<>();
+        L.addLast(20);
+        L.addFirst(11);
+        A.addLast(20);
+        A.addFirst(10);
+
+
+
+
+
+
+//        L.getLast();
+        System.out.println(L.equals(b));
+    }
 }
 

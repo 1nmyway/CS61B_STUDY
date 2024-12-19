@@ -95,23 +95,45 @@ public class ArrayDeque<Item> implements Deque<Item>{
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) {
-            return false;
-        }
-        if (o == this) {
-            return true;
-        }
-        if (!(o instanceof ArrayDeque)) {
-            return false;
-        }
-        ArrayDeque<?> ad = (ArrayDeque<?>) o;
-        if (ad.size() != size) {
-            return false;
-        }
-        for (int i = 0; i < size; i++) {
-            if (ad.get(i) != get(i)) {
+        // 检查对象是否为当前类的实例
+        if (o instanceof ArrayDeque<?>) {
+            ArrayDeque<?> other = (ArrayDeque<?>) o;
+
+            // 如果两个队列大小不同，则它们不可能相等
+            if (this.size() != other.size()) {
                 return false;
             }
+
+            // 使用迭代器遍历两个队列，并比较每个元素
+            Iterator<Item> thisIterator = this.iterator();
+            Iterator<?> otherIterator = other.iterator();
+
+            while (thisIterator.hasNext() && otherIterator.hasNext()) {
+                // 如果在任何位置元素不相等，则返回 false
+                if (!thisIterator.next().equals(otherIterator.next())) {
+                    return false;
+                }
+            }
+        }else if(o instanceof LinkedListDeque<?>){
+            LinkedListDeque<?> other = (LinkedListDeque<?>) o;
+
+            // 如果两个队列大小不同，则它们不可能相等
+            if (this.size() != other.size()) {
+                return false;
+            }
+
+            // 使用迭代器遍历两个队列，并比较每个元素
+            Iterator<Item> thisIterator = this.iterator();
+            Iterator<?> otherIterator = other.iterator();
+
+            while (thisIterator.hasNext() && otherIterator.hasNext()) {
+                // 如果在任何位置元素不相等，则返回 false
+                if (!thisIterator.next().equals(otherIterator.next())) {
+                    return false;
+                }
+            }
+        }else{
+            return false;
         }
         return true;
     }
@@ -133,6 +155,19 @@ public class ArrayDeque<Item> implements Deque<Item>{
             return item;
         }
     }
+    public static void main(String[] args) {
+        LinkedListDeque<Integer> L = new LinkedListDeque<>();
+        ArrayDeque<Integer> A = new ArrayDeque<>();
+        ArrayDeque<Integer> A2 = new ArrayDeque<>();
+        L.addLast(20);
+        L.addFirst(10);
+        A.addLast(20);
+        A.addFirst(10);
+        A2.addLast(20);
+        A2.addFirst(10);
+        System.out.println(A2.equals(A));
+    }
+}
 
 //    public static void main(String[] args) {
 //        ArrayDeque<Integer> L = new ArrayDeque<>();
@@ -145,4 +180,4 @@ public class ArrayDeque<Item> implements Deque<Item>{
 //        System.out.println(L.size()+" "+L.get(0)+" "+L.get(1)+" "+L.get(2)+" "+L.size());
 //    }
 
-}
+
