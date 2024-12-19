@@ -200,14 +200,14 @@ public class LinkedListDeque<Item> implements Deque<Item>{
             System.out.println(iterator.next()); // 移动到下一个节点
         }
     }
-    public static void main(String[] args) {
-        LinkedListDeque<Integer> L = new LinkedListDeque<>();
-        ArrayDeque<Integer> A = new ArrayDeque<>();
-        ArrayList<Integer> b = new ArrayList<>();
-        L.addLast(20);
-        L.addFirst(11);
-        A.addLast(20);
-        A.addFirst(10);
+//    public static void main(String[] args) {
+//        LinkedListDeque<Integer> L = new LinkedListDeque<>();
+//        ArrayDeque<Integer> A = new ArrayDeque<>();
+//        ArrayList<Integer> b = new ArrayList<>();
+//        L.addLast(20);
+//        L.addFirst(11);
+//        A.addLast(20);
+//        A.addFirst(10);
 
 
 
@@ -215,7 +215,7 @@ public class LinkedListDeque<Item> implements Deque<Item>{
 
 
 //        L.getLast();
-        System.out.println(L.equals(b));
-    }
+//        System.out.println(L.equals(b));
+    
 }
 
