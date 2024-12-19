@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class LinkedListDeque<Item> implements Deque<Item>{
+public class LinkedListDeque<Item> implements Deque<Item>, Iterable<Item>{
     private class IntNode {
         public Item item;
         public IntNode next;
@@ -146,26 +146,8 @@ public class LinkedListDeque<Item> implements Deque<Item>{
 
     public boolean equals(Object o) {
         // 检查对象是否为当前类的实例
-        if (o instanceof ArrayDeque<?>) {
+        if (o instanceof Deque<?>) {
             ArrayDeque<?> other = (ArrayDeque<?>) o;
-
-            // 如果两个队列大小不同，则它们不可能相等
-            if (this.size() != other.size()) {
-                return false;
-            }
-
-            // 使用迭代器遍历两个队列，并比较每个元素
-            Iterator<Item> thisIterator = this.iterator();
-            Iterator<?> otherIterator = other.iterator();
-
-            while (thisIterator.hasNext() && otherIterator.hasNext()) {
-                // 如果在任何位置元素不相等，则返回 false
-                if (!thisIterator.next().equals(otherIterator.next())) {
-                    return false;
-                }
-            }
-        }else if(o instanceof LinkedListDeque<?>){
-            LinkedListDeque<?> other = (LinkedListDeque<?>) o;
 
             // 如果两个队列大小不同，则它们不可能相等
             if (this.size() != other.size()) {
@@ -201,21 +183,16 @@ public class LinkedListDeque<Item> implements Deque<Item>{
         }
     }
 //    public static void main(String[] args) {
-//        LinkedListDeque<Integer> L = new LinkedListDeque<>();
-//        ArrayDeque<Integer> A = new ArrayDeque<>();
-//        ArrayList<Integer> b = new ArrayList<>();
-//        L.addLast(20);
-//        L.addFirst(11);
-//        A.addLast(20);
-//        A.addFirst(10);
+//        LinkedListDeque<String> L = new LinkedListDeque<>();
+//        ArrayDeque<String> A = new ArrayDeque<>();
+//        L.addLast("abc");
+//        A.removeFirst();
+//        A.addFirst("ab");
+//        A.removeFirst();
+//        A.addFirst("abcd");
+//
+//        System.out.println(L.equals(A));
+//    }
 
-
-
-
-
-
-//        L.getLast();
-//        System.out.println(L.equals(b));
-    
 }
 
