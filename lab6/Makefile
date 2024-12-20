@@ -15,7 +15,8 @@
 # I strongly recommend that you try to figure it out, and where you cannot,
 # that you ask questions.  The Lab Reader contains documentation.
 
-# Name of package containing main procedure 
+# Name of package containing main procedure
+
 PACKAGE = capers
 
 # The name of the Python 3 program, used in the 'check' target.  If your system
