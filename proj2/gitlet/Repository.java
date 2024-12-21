@@ -107,7 +107,7 @@ public class Repository {
 
     public static void commit(String message) {
         File f = new File("E:/CS61B/skeleton-sp21/proj2/.gitlet/HEAD");
-        Commit commit = new Commit(message,, new Date(),new HashMap<>(),"","","");
+        Commit commit = new Commit( new Date(),new HashMap<>(),"","","");
 
 
     }
