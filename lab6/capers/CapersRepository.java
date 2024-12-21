@@ -33,8 +33,42 @@ public class CapersRepository {
      *
      * .capers/ -- top level folder for all persistent data in your lab12 folder
      *    - dogs/ -- folder containing all of the persistent data for dogs
+     *
      *    - story -- file containing the current story
      */
+
+    /** The .gitlet directory. */
+    public static final File GITLET_DIR = join(CWD, ".gitlet");
+
+    public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
+    public static final File COMMIT_DIR = join(OBJECTS_DIR, "commit");
+    public static final File BLOB_DIR = join(OBJECTS_DIR, "blob");
+    public static final File REFS_DIR = join(GITLET_DIR, "refs");
+    public static final File HEADS_DIR = join(REFS_DIR, "heads");
+    public static final File MASTER_DIR = join(HEADS_DIR, "master");
+    public static final File ADDSTAGE_DIR = join(GITLET_DIR, "addstage");
+    public static final File REMOVESATGE_DIR = join(GITLET_DIR, "removestage");
+    public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
+
+
+
+    /* TODO: fill in the rest of this class. */
+    public static void init() {
+        GITLET_DIR.mkdir();
+        OBJECTS_DIR.mkdir();
+        COMMIT_DIR.mkdir();
+        BLOB_DIR.mkdir();
+        REFS_DIR.mkdir();
+        HEADS_DIR.mkdir();
+        MASTER_DIR.mkdir();
+        ADDSTAGE_DIR.mkdir();
+        REMOVESATGE_DIR.mkdir();
+        try {
+            HEAD_FILE.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public static void setupPersistence() {
         // TODO
 

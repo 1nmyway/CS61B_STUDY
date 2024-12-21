@@ -60,6 +60,9 @@ public class Main {
             // TODO: celebrate this dog's birthday
             CapersRepository.celebrateBirthday(args[1]);
             break;
+            case "init":
+                CapersRepository.init();
+                break;
         default:
             exitWithError(String.format("Unknown command: %s", args[0]));
         }
