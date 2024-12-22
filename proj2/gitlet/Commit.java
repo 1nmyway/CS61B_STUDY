@@ -77,7 +77,7 @@ public class Commit implements Serializable {
         this.currentDate=new Date(0);
         Commit commit = new Commit("initial commit", new ArrayList<>(),currentDate,new HashMap<>());
         String initCommitHashID = commit.generatelID();
-        Commit initCommit =new Commit("initCommit", new ArrayList<>(), dateToTimeStamp(currentDate),new HashMap<>(),initCommitHashID,"","initCommit");
+        Commit initCommit =new Commit("initial commit", new ArrayList<>(), dateToTimeStamp(currentDate),new HashMap<>(),initCommitHashID,"","initCommit");
         File f = join(Repository.COMMIT_DIR, initCommitHashID);
         try {
             f.createNewFile();

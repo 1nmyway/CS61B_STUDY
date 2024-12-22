@@ -157,11 +157,13 @@ public class Repository {
         }
         for (int i=0;i<fileNames.size();i++) {
             String fileName = fileNames.get(i);
-            String addstageFilePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage" +fileName;
-            File file3 = join(ADDSTAGE_DIR,fileName);
+
+            File file3 = join(ADDSTAGE_DIR,fileName); //addstage目录下的文件
+            File file4 = join(BLOB_DIR,fileName);//blob目录下的文件
+            String blobPath =file4.getPath();    //.gitlet/objects/blob/Main.java
             //File file3 = new File(addstageFilePath);
             String hashBlobID = readContentsAsString(file3);
-            blobMap.put(addstageFilePath,hashBlobID); //存放blob文件路径和hash id
+            blobMap.put(blobPath,hashBlobID); //在commit文件里存放blob文件路径和hash id
             rm(fileName);           //删除addstage中的内容
         }
         Commit commit = new Commit(message, parents, date,blobMap);//创建新的commit,作用是生成hashid
@@ -180,16 +182,47 @@ public class Repository {
 
 
     public static void rm(String filename) {
-        File newFile = join(ADDSTAGE_DIR,filename);
-
-        if(Utils.restrictedDelete(newFile)){
+        //File stageFile = join(ADDSTAGE_DIR,filename);
+        String headHashID = readContentsAsString(HEAD_FILE);
+        //List<String> fileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);
+        //String path =
+        File file2 = join(COMMIT_DIR,headHashID);
+        File blobFile = join(BLOB_DIR,filename);
+        String blobFilePath = blobFile.getPath();
+        File stageFile = join(ADDSTAGE_DIR,filename);
+        Commit commit = readObject(file2, Commit.class);
+//        for (String key : commit.pathToBlobID.keySet()) {
+//            System.out.println(key + ": " + commit.pathToBlobID.get(key));
+//        }   测试，打印出pathToBlobID内的所有内容
+        if(commit.pathToBlobID.get(blobFilePath)!=null){  //在当前提交中跟踪
+            add(filename);     //添加到暂存区
+            restrictedDelete(blobFile);
+        }
+        //如果已暂存，取消暂存
+        else if(stageFile.exists()){
+            restrictedDelete(stageFile);
             File f = join(REMOVESATGE_DIR,filename);
             try {
                 f.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }else{
+        }
+
+
+//        if(Utils.plainFilenamesIn(COMMIT_DIR).contains(headHashID)){
+//            File f = join(BLOB_DIR,filename);
+//            restrictedDelete(f);
+//        }
+//        if(stageFile.exists()){
+//            restrictedDelete(stageFile);
+//            File f = join(REMOVESATGE_DIR,filename);
+//            try {
+//                f.createNewFile();
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+        else{
             System.out.println("no reason to remove the file.");
         }
     }
