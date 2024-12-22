@@ -30,16 +30,16 @@ public class Main {
                 Repository.rm(args[1]);
                 break;
             case "log":
-                Repository.rm(args[1]);
+                Repository.log();
                 break;
             case "global-log":
-                Repository.rm(args[1]);
+                Repository.globalLog();
                 break;
             case "find":
-                Repository.rm(args[1]);
+                Repository.find(args[1]);
                 break;
             case "status":
-                Repository.rm(args[1]);
+                Repository.status();
                 break;
             case "checkout":
                 Repository.rm(args[1]);

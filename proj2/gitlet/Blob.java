@@ -23,10 +23,15 @@ public class Blob implements Serializable {
         this.ID = ID;
         this.bytes = bytes;
     }
-    Blob(File fileName) {
-        this.fileName = fileName;
+    Blob(byte[] bytes) {
+        this.bytes = bytes;
     }
-    public String generatelID(){
-        return Utils.sha1(fileName);
+    Blob(File fileName){this.fileName = fileName;}
+    public byte[] getBytes() {
+        return Utils.readContents(fileName);
     }
+    public String generatelID(byte[] bytes){
+        return Utils.sha1(bytes);
+    }
+    //tttt
 }
