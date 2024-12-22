@@ -107,7 +107,9 @@ public class Repository {
     public static void add(String filename) {
 
         String filePath = findFileRecursively(CWD, filename);
-
+        if (filePath==null){
+            System.out.println("File does not exist.");
+        }
         File file = new File(filePath);
         String contents = readContentsAsString(file);
         Blob blob0 = new Blob();
@@ -268,6 +270,8 @@ public class Repository {
         System.out.print("\n");
         System.out.println("=== Untracked Files ===");
     }
+
+    public static void checkout(){}
 
 
 }
