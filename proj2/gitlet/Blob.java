@@ -9,6 +9,7 @@ public class Blob implements Serializable {
     private String filePath;
     private File blobSaveFileName;
     public byte[] bytes;
+    public String fileContent;
     Blob() {}
     Blob(File fileName, String filePath,String ID,byte[] bytes,File blobSaveFileName) {
         this.fileName = fileName;
@@ -17,11 +18,12 @@ public class Blob implements Serializable {
         this.bytes = bytes;
         this.blobSaveFileName = blobSaveFileName;
     }
-    Blob(File fileName, String filePath,String ID,byte[] bytes) {
+    Blob(File fileName, String filePath,String ID,String fileContent) {
         this.fileName = fileName;
         this.filePath = filePath;
         this.ID = ID;
-        this.bytes = bytes;
+        this.fileContent = fileContent;
+
     }
     Blob(byte[] bytes) {
         this.bytes = bytes;
@@ -30,8 +32,8 @@ public class Blob implements Serializable {
     public byte[] getBytes() {
         return Utils.readContents(fileName);
     }
-    public String generatelID(byte[] bytes){
-        return Utils.sha1(bytes);
+    public String generatelID(String fileContent){
+        return Utils.sha1(fileContent);
     }
     //tttt
 }

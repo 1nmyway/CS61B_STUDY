@@ -81,23 +81,44 @@ public class Repository {
             }
         }
     }
+    private static String findFileRecursively(File directory, String fileName) {
+        // 列出目录中的所有文件和子目录
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                // 如果是文件且文件名匹配，则打印文件路径并返回
+                if (file.isFile() && file.getName().equalsIgnoreCase(fileName)) {
+                    return file.getAbsolutePath();
+                }
+                // 如果是子目录，则递归查找并检查返回值
+                else if (file.isDirectory()) {
+                    String result = findFileRecursively(file, fileName);
+                    if (result != null) {
+                        return result; // 如果递归调用找到了文件，则返回其路径
+                    }
+                }
+            }
+        }
+        // 如果没有找到文件，则返回null
+        return null;
+    }
+
     public static void add(String filename) {
 
-        String filePath = "E:/CS61B/skeleton-sp21/proj2/gitlet"+"/"+filename;
-        String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
-        File f = new File(filePath);  //要添加进blob的文件
-        File f3 = new File(addstagePath);
-        //
-        Blob blob0 = new Blob(f);
-        byte[] blobBytes = blob0.getBytes();
-        String hashBlobID = blob0.generatelID(blobBytes);//得到hash id
+        String filePath = findFileRecursively(CWD, filename);
+
+        File file = new File(filePath);
+        String contents = readContentsAsString(file);
+        Blob blob0 = new Blob();
+        String hashBlobID = blob0.generatelID(contents);//得到hash id
         File f4 = join(BLOB_DIR,filename);//新建blob目录下的储存blob的文件
         try {
             f4.createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Blob blob = new Blob(f,filePath,hashBlobID,blobBytes); //新加的blob
+        Blob blob = new Blob(file,filePath,hashBlobID,contents); //新加的blob
         writeObject(f4,blob);//把blob对象写入blob文件
 
         File f5 = join(ADDSTAGE_DIR,filename);
