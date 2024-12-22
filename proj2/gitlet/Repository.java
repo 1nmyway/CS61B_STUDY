@@ -134,7 +134,7 @@ public class Repository {
                 }
                 writeContents(f5, hashBlobID);//把hash写入存在addstage文件里的blob
             } else {                         //哈希值相同
-                Repository.rm(hashBlobID);
+
             }
         }
     }
@@ -190,29 +190,27 @@ public class Repository {
         File blobFile = join(BLOB_DIR,filename);
         String blobFilePath = blobFile.getPath();
         File stageFile = join(ADDSTAGE_DIR,filename);
+
+        System.out.println(stageFile.exists());
         Commit commit = readObject(file2, Commit.class);
 //        for (String key : commit.pathToBlobID.keySet()) {
 //            System.out.println(key + ": " + commit.pathToBlobID.get(key));
 //        }   测试，打印出pathToBlobID内的所有内容
         if(commit.pathToBlobID.get(blobFilePath)!=null){  //在当前提交中跟踪
-            add(filename);     //添加到暂存区
+            //add(filename);     //添加到暂存区
             restrictedDelete(blobFile);
-//            File f = join(REMOVESATGE_DIR,filename);
+
+        }
+        //            File f = join(REMOVESATGE_DIR,filename);
 //            try {
 //                f.createNewFile();
 //            } catch (IOException e) {
 //                throw new RuntimeException(e);
 //            }
-        }
         //如果已暂存，取消暂存
         else if(stageFile.exists()){
             restrictedDelete(stageFile);
-//            File f = join(REMOVESATGE_DIR,filename);
-//            try {
-//                f.createNewFile();
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
+            System.out.println(restrictedDelete(stageFile));
         }
 
 
