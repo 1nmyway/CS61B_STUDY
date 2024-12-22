@@ -109,32 +109,33 @@ public class Repository {
         String filePath = findFileRecursively(CWD, filename);
         if (filePath==null){
             System.out.println("File does not exist.");
-        }
-        File file = new File(filePath);
-        String contents = readContentsAsString(file);
-        Blob blob0 = new Blob();
-        String hashBlobID = blob0.generatelID(contents);//得到hash id
-        File f4 = join(BLOB_DIR,filename);//新建blob目录下的储存blob的文件
-        try {
-            f4.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        Blob blob = new Blob(file,filePath,hashBlobID,contents); //新加的blob
-        writeObject(f4,blob);//把blob对象写入blob文件
-
-        File f5 = join(ADDSTAGE_DIR,filename);
-        //如果版本相同，不添加，版本不同，添加
-        //
-        if (!f5.exists()) {                      //哈希值不同
+        }else {
+            File file = new File(filePath);
+            String contents = readContentsAsString(file);
+            Blob blob0 = new Blob();
+            String hashBlobID = blob0.generatelID(contents);//得到hash id
+            File f4 = join(BLOB_DIR, filename);//新建blob目录下的储存blob的文件
             try {
-                f5.createNewFile();
+                f4.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            writeContents(f5,hashBlobID);//把hash写入存在addstage文件里的blob
-        }else{                         //哈希值相同
-            Repository.rm(hashBlobID);
+            Blob blob = new Blob(file, filePath, hashBlobID, contents); //新加的blob
+            writeObject(f4, blob);//把blob对象写入blob文件
+
+            File f5 = join(ADDSTAGE_DIR, filename);
+            //如果版本相同，不添加，版本不同，添加
+            //
+            if (!f5.exists()) {                      //哈希值不同
+                try {
+                    f5.createNewFile();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                writeContents(f5, hashBlobID);//把hash写入存在addstage文件里的blob
+            } else {                         //哈希值相同
+                Repository.rm(hashBlobID);
+            }
         }
     }
 
@@ -193,21 +194,25 @@ public class Repository {
         String commitHashID = readContentsAsString(Repository.HEAD_FILE);
         File f = join(COMMIT_DIR, commitHashID);//头指针指向的commit
         Commit commit = readObject(f, Commit.class);
-        while (!commit.message.equals("initCommit")) {
+        while (!commit.ID.equals(" ")) {
             System.out.println("===");
             System.out.println(commit.ID);
             System.out.println(commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
-            File f2 = join(COMMIT_DIR, commit.parents.get(0));
-            commit = readObject(f2, Commit.class);
+            try {
+                File f2 = join(COMMIT_DIR, commit.parents.get(0));
+                commit = readObject(f2, Commit.class);
+            }catch (IndexOutOfBoundsException e){
+             break;
+            }
         }
     }
     public static void globalLog() {
         String commitHashID = readContentsAsString(Repository.HEAD_FILE);
         File f = join(COMMIT_DIR, commitHashID);//头指针指向的commit
         Commit commit = readObject(f, Commit.class);
-        while (!commit.message.equals("initCommit")) {
+        while (!commit.ID.equals(" ")) {
             System.out.println("===");
             System.out.println(commit.ID);
             System.out.println(commit.timestamp);
@@ -217,8 +222,12 @@ public class Repository {
             System.out.println(commit.author);
             System.out.println(commit.fileName);
             System.out.print("\n");
-            File f2 = join(COMMIT_DIR, commit.parents.get(0));
-            commit = readObject(f2, Commit.class);
+            try {
+                File f2 = join(COMMIT_DIR, commit.parents.get(0));
+                commit = readObject(f2, Commit.class);
+            }catch (IndexOutOfBoundsException e){
+                break;
+            }
         }
     }
 
