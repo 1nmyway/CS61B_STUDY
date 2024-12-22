@@ -158,7 +158,9 @@ public class Repository {
         for (int i=0;i<fileNames.size();i++) {
             String fileName = fileNames.get(i);
             String addstageFilePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage" +fileName;
-            blobMap.put(addstageFilePath,fileName);
+            File file3 = new File(addstageFilePath);
+            String hashBlobID = readContentsAsString(file3);
+            blobMap.put(addstageFilePath,hashBlobID); //存放blob文件路径和hash id
             rm(fileName);           //删除addstage中的内容
         }
         Commit commit = new Commit(message, parents, date,blobMap);//创建新的commit,作用是生成hashid
@@ -196,8 +198,8 @@ public class Repository {
         Commit commit = readObject(f, Commit.class);
         while (!commit.ID.equals(" ")) {
             System.out.println("===");
-            System.out.println(commit.ID);
-            System.out.println(commit.timestamp);
+            System.out.println("commit "+commit.ID);
+            System.out.println("Date: "+commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
             try {
