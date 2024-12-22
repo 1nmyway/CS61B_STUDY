@@ -149,7 +149,7 @@ public class Repository {
         //String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
         //File f = new File(addstagePath);
         List<String> fileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
-        if (fileNames == null){
+        if (fileNames.isEmpty()){
             System.out.println("No changes added to the commit.");
         }
         for (int i=0;i<fileNames.size();i++) {
@@ -175,7 +175,7 @@ public class Repository {
 
     public static void rm(String filename) {
         File newFile = join(ADDSTAGE_DIR,filename);
-        
+
         if(Utils.restrictedDelete(newFile)){
             File f = join(REMOVESATGE_DIR,filename);
             try {
