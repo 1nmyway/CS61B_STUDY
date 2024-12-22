@@ -158,7 +158,8 @@ public class Repository {
         for (int i=0;i<fileNames.size();i++) {
             String fileName = fileNames.get(i);
             String addstageFilePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage" +fileName;
-            File file3 = new File(addstageFilePath);
+            File file3 = join(ADDSTAGE_DIR,fileName);
+            //File file3 = new File(addstageFilePath);
             String hashBlobID = readContentsAsString(file3);
             blobMap.put(addstageFilePath,hashBlobID); //存放blob文件路径和hash id
             rm(fileName);           //删除addstage中的内容
