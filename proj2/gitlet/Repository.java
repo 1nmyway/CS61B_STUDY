@@ -164,7 +164,7 @@ public class Repository {
             //File file3 = new File(addstageFilePath);
             String hashBlobID = readContentsAsString(file3);
             blobMap.put(blobPath,hashBlobID); //在commit文件里存放blob文件路径和hash id
-            rm(fileName);           //删除addstage中的内容
+            //rm(fileName);           //删除addstage中的内容
         }
         Commit commit = new Commit(message, parents, date,blobMap);//创建新的commit,作用是生成hashid
         String commitHashID = commit.generatelID();
@@ -197,6 +197,12 @@ public class Repository {
         if(commit.pathToBlobID.get(blobFilePath)!=null){  //在当前提交中跟踪
             add(filename);     //添加到暂存区
             restrictedDelete(blobFile);
+            File f = join(REMOVESATGE_DIR,filename);
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         //如果已暂存，取消暂存
         else if(stageFile.exists()){
