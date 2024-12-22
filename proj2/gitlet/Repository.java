@@ -259,6 +259,10 @@ public class Repository {
             String fileName = removeFileNames.get(i);
             System.out.println(fileName);
         }
+        System.out.print("\n");
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        System.out.print("\n");
+        System.out.println("=== Untracked Files ===");
     }
 
 
