@@ -191,7 +191,7 @@ public class Repository {
         String blobFilePath = blobFile.getPath();
         File stageFile = join(ADDSTAGE_DIR,filename);
 
-        System.out.println(stageFile.exists());
+        //System.out.println(stageFile.exists());
         Commit commit = readObject(file2, Commit.class);
 //        for (String key : commit.pathToBlobID.keySet()) {
 //            System.out.println(key + ": " + commit.pathToBlobID.get(key));
@@ -210,7 +210,7 @@ public class Repository {
         //如果已暂存，取消暂存
         else if(stageFile.exists()){
             restrictedDelete(stageFile);
-            System.out.println(restrictedDelete(stageFile));
+            //System.out.println(restrictedDelete(stageFile));
         }
 
 
