@@ -91,7 +91,7 @@ public class Repository {
         Blob blob0 = new Blob(f);
         byte[] blobBytes = blob0.getBytes();
         String hashBlobID = blob0.generatelID(blobBytes);//得到hash id
-        File f4 = join(BLOB_DIR,hashBlobID);//新建blob目录下的储存blob的文件，文件名使用hasd ID
+        File f4 = join(BLOB_DIR,filename);//新建blob目录下的储存blob的文件
         try {
             f4.createNewFile();
         } catch (IOException e) {
@@ -100,7 +100,7 @@ public class Repository {
         Blob blob = new Blob(f,filePath,hashBlobID,blobBytes); //新加的blob
         writeObject(f4,blob);//把blob对象写入blob文件
 
-        File f5 = join(ADDSTAGE_DIR,hashBlobID);
+        File f5 = join(ADDSTAGE_DIR,filename);
         //如果版本相同，不添加，版本不同，添加
         //
         if (!f5.exists()) {                      //哈希值不同
