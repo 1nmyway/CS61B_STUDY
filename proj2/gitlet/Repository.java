@@ -130,7 +130,7 @@ public class Repository {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            writeContents(f5,hashBlobID);
+            writeContents(f5,hashBlobID);//把hash写入存在addstage文件里的blob
         }else{                         //哈希值相同
             Repository.rm(hashBlobID);
         }
@@ -148,11 +148,15 @@ public class Repository {
         TreeMap<String,String> blobMap = new TreeMap<>();
         //String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
         //File f = new File(addstagePath);
-        List<String> fileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR); //从addstage暂存区中提取所有的文件名
+        List<String> fileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
+        if (fileNames == null){
+            System.out.println("No changes added to the commit.");
+        }
         for (int i=0;i<fileNames.size();i++) {
             String fileName = fileNames.get(i);
             String addstageFilePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage" +fileName;
             blobMap.put(addstageFilePath,fileName);
+            rm(fileName);           //删除addstage中的内容
         }
         Commit commit = new Commit(message, parents, date,blobMap);//创建新的commit,作用是生成hashid
         String commitHashID = commit.generatelID();
@@ -170,8 +174,8 @@ public class Repository {
 
 
     public static void rm(String filename) {
-        String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
-        File newFile = new File(addstagePath+"/"+filename);
+        File newFile = join(ADDSTAGE_DIR,filename);
+        
         if(Utils.restrictedDelete(newFile)){
             File f = join(REMOVESATGE_DIR,filename);
             try {
