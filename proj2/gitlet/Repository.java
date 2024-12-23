@@ -195,12 +195,29 @@ public class Repository {
 
     public static void rm2(String filename) {
         //if the file is not staged, print an error message
-        if (!join(ADDSTAGE_DIR, filename).exists()) {
+        
+        //remove the file from the staging area
+        if (join(ADDSTAGE_DIR, filename).exists()){
+        join(ADDSTAGE_DIR, filename).delete();
+        return;
+        }
+
+        String filePath = findFileRecursively(CWD, filename);
+        File file = new File(filePath);
+        String contents = readContentsAsString(file);
+        Blob blob0 = new Blob();
+        String hashBlobID = blob0.generatelID(contents);//得到hash id
+        Commit headCommit = getCommitFromHead();
+        if (headCommit.blobID.contains(hashBlobID)){
+            headCommit.blobID.remove(hashBlobID);
+            file.delete();
+            return;
+        }else{
             System.out.println("No reason to remove the file.");
             return;
         }
-        //remove the file from the staging area
-        join(ADDSTAGE_DIR, filename).delete();
+
+
     }
 
 
