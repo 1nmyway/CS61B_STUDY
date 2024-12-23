@@ -53,6 +53,8 @@ public class Main {
                 }
                 else if (args.length==2){
                     Repository.checkout3(args[1]);
+                }else{
+
                 }
 
                 break;

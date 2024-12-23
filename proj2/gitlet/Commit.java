@@ -37,6 +37,7 @@ public class Commit implements Serializable {
     public String fileName;
     public Date currentDate;
     public Map<String,String> pathToBlobID ;
+    public List<String> blobID;
     static int num;
     Commit(){}
     Commit (String message, List<String> parents,String timestamp,Map<String,String> pathToBlobID ) {
@@ -53,11 +54,28 @@ public class Commit implements Serializable {
         this.pathToBlobID = pathToBlobID;
 
     }
+    Commit (String message, List<String> parents,Date currentDate,List<String> blobID ) {//用于生成hash id
+        this.message = message;
+        this.parents = parents;
+        this.currentDate = currentDate;
+        this.blobID = blobID;
+
+    }
     Commit (String message, List<String> parents,String timestamp,Map<String,String> pathToBlobID ,String ID,String author,String fileName) {
         this.message = message;
         this.parents = parents;
         this.timestamp = timestamp;
         this.pathToBlobID = pathToBlobID;
+        this.ID = ID;
+        this.author = author;
+        this.fileName = fileName;
+
+    }
+    Commit (String message, List<String> parents,String timestamp,List<String> blobID ,String ID,String author,String fileName) {
+        this.message = message;
+        this.parents = parents;
+        this.timestamp = timestamp;
+        this.blobID = blobID;
         this.ID = ID;
         this.author = author;
         this.fileName = fileName;
@@ -71,7 +89,7 @@ public class Commit implements Serializable {
     }
 
     public String generatelID(){
-        return Utils.sha1(dateToTimeStamp(currentDate), message, parents.toString(), pathToBlobID.toString());
+        return Utils.sha1(dateToTimeStamp(currentDate), message, parents.toString());
     }
     public  void initCommit() {
         this.currentDate=new Date(0);
