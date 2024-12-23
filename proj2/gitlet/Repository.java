@@ -180,27 +180,42 @@ public class Repository {
         writeContents(Repository.HEAD_FILE, commitHashID);//把头指针指向commit
     }
 
+    public static void rm2(String filename) {
+        //if the file is not staged, print an error message
+        if (!join(GITLET_DIR, "staging", filename).exists()) {
+            System.out.println("No reason to remove the file.");
+            return;
+        }
+        //remove the file from the staging area
+        join(GITLET_DIR, "staging", filename).delete();
+    }
+
 
     public static void rm(String filename) {
         //File stageFile = join(ADDSTAGE_DIR,filename);
         String headHashID = readContentsAsString(HEAD_FILE);
         //List<String> fileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);
         //String path =
-        File file2 = join(COMMIT_DIR,headHashID);
-        File blobFile = join(BLOB_DIR,filename);
+        File file2 = join(COMMIT_DIR, headHashID);
+        File blobFile = join(BLOB_DIR, filename);
         String blobFilePath = blobFile.getPath();
-        File stageFile = join(ADDSTAGE_DIR,filename);
+        File stageFile = join(ADDSTAGE_DIR, filename);
 
         //System.out.println(stageFile.exists());
         Commit commit = readObject(file2, Commit.class);
 //        for (String key : commit.pathToBlobID.keySet()) {
 //            System.out.println(key + ": " + commit.pathToBlobID.get(key));
 //        }   测试，打印出pathToBlobID内的所有内容
-        if(commit.pathToBlobID.get(blobFilePath)!=null){  //在当前提交中跟踪
+        if (commit.pathToBlobID.get(blobFilePath) != null) {  //在当前提交中跟踪
             //add(filename);     //添加到暂存区
             restrictedDelete(blobFile);
 
         }
+
+
+        //remove the file from the staging area
+
+
         //            File f = join(REMOVESATGE_DIR,filename);
 //            try {
 //                f.createNewFile();
