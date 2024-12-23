@@ -127,10 +127,10 @@ public class Repository {
                 throw new RuntimeException(e);
             }
             Blob blob = new Blob(filename, filePath, hashBlobID, contents); //新加的blob
-            System.out.println("Added: " + filename);
-            System.out.println("id"+hashBlobID);
-            System.out.println("content: "+contents);
-            System.out.println("path:"+filePath);
+//            System.out.println("Added: " + filename);
+//            System.out.println("id"+hashBlobID);
+//            System.out.println("content: "+contents);
+//            System.out.println("path:"+filePath);
             writeObject(f4, blob);//把blob对象写入blob文件
 
             File f5 = join(ADDSTAGE_DIR, filename);
@@ -265,8 +265,8 @@ public class Repository {
         Commit commit = readObject(f, Commit.class);
         while (!commit.ID.equals(" ")) {
             System.out.println("===");
-            System.out.println("commit " + commit.ID);
-            System.out.println("Date: " + commit.timestamp);
+            System.out.println(commit.ID);
+            System.out.println(commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
             try {
@@ -373,7 +373,7 @@ public class Repository {
         List<File> blobFilesList = new ArrayList<>();
         for (String blobID : commit.blobID){
             blobFilesList.add(join(BLOB_DIR, blobID));
-            System.out.println(blobID);
+            //System.out.println(blobID);
         }
 //        for (File file: blobFilesList){
 //            Blob
@@ -442,30 +442,29 @@ public class Repository {
             return;
         } else {
             currentBranch = branch;
-            String headCommitID = readContentsAsString(branch);
-            Commit commit = readObject(join(COMMIT_DIR, headCommitID), Commit.class);
+            String headCommitID = readContentsAsString(branch); //提取分支指针指向的commit
+            Commit commit = readObject(join(COMMIT_DIR, headCommitID), Commit.class);//葱commit目录读取分支的提取commit对象
             writeContents(HEAD_FILE, headCommitID);
 
-            for (String fileName : commit.blobID) {
-                String filePath = findFileRecursively(CWD, fileName);
+            for (String fileName : commit.blobID) {  //从commit里拿blobid
 
-                File f = new File(filePath);   //工作目录中要修改的文件
-                String contents = readContentsAsString(f);
-                Blob blob0 = new Blob();
-                String hashBlobID = blob0.generatelID(contents);//得到hash id
+                File f2 = join(BLOB_DIR, fileName); //找到blob对象
+                Blob blob = readObject(f2, Blob.class);
+
+                String filePath = findFileRecursively(CWD, blob.fileName);
+                File workfile = new File(filePath);   //工作目录中要修改的文件
+//                String contents = readContentsAsString(f);
+//                Blob blob0 = new Blob();
+//                String hashBlobID = blob0.generatelID(contents);//得到hash id
 //                if (!commit.blobID.contains(hashBlobID)){
 //                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
 //                    return;
 //                }
-                List<File> files = getBlobFileListFromCommit(commit);
-                for (File file : files)
-                {
-                    Blob blob = readObject(file, Blob.class);
-                    writeContents(f, blob.fileContent);
+                    writeContents(workfile, blob.fileContent);
                 }
             }
         }
-    }
+
 
     public static void branch(String branchName){
         File newBranch = join(HEADS_DIR, branchName);
