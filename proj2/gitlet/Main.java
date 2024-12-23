@@ -46,16 +46,21 @@ public class Main {
                 Repository.status();
                 break;
             case "checkout":
-                if (args[1].equals("--")){
-                    Repository.rm(args[1]);
-                }else if (args[1].equals("--")){}
-                Repository.rm(args[1]);
+                if (args.length==3){
+                    Repository.checkout1(args[2]);
+                }else if (args.length==4) {
+                    Repository.checkout2(args[1], args[3]);
+                }
+                else if (args.length==2){
+                    Repository.checkout3(args[1]);
+                }
+
                 break;
             case "branch":
-                Repository.rm(args[1]);
+                Repository.branch(args[1]);
                 break;
             case "rm-branch":
-                Repository.rm(args[1]);
+                Repository.rm_branch(args[1]);
                 break;
             case "reset":
                 Repository.rm(args[1]);
