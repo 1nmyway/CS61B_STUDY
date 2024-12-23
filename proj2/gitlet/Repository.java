@@ -115,11 +115,19 @@ public class Repository {
         String filePath = findFileRecursively(CWD, filename);
         if (filePath == null) {
             System.out.println("File does not exist.");
+            return;
         } else {
             File file = new File(filePath);
             String contents = readContentsAsString(file);
             Blob blob0 = new Blob();
             String hashBlobID = blob0.generatelID(contents);//得到hash id
+            File removeFile = join(REMOVESATGE_DIR, filename);
+            if(removeFile.exists()) {
+                //System.out.println(hashBlobID+" "+readContentsAsString(removeFile));
+                if (contents.equals(readContentsAsString(removeFile))) {
+                    removeFile.delete();
+                }
+            }
             File f4 = join(BLOB_DIR, hashBlobID);//新建blob目录下的储存blob的文件,名字使用hash id
             try {
                 f4.createNewFile();
@@ -195,22 +203,37 @@ public class Repository {
 
     public static void rm2(String filename) {
         //if the file is not staged, print an error message
-        
+        File f = join(REMOVESATGE_DIR, filename);
         //remove the file from the staging area
-        if (join(ADDSTAGE_DIR, filename).exists()){
-        join(ADDSTAGE_DIR, filename).delete();
-        return;
-        }
-
         String filePath = findFileRecursively(CWD, filename);
         File file = new File(filePath);
         String contents = readContentsAsString(file);
-        Blob blob0 = new Blob();
-        String hashBlobID = blob0.generatelID(contents);//得到hash id
+       Blob blob0 = new Blob();
+       String hashBlobID = blob0.generatelID(contents);//得到hash id
         Commit headCommit = getCommitFromHead();
+
+        if (join(ADDSTAGE_DIR, filename).exists()){
+        join(ADDSTAGE_DIR, filename).delete();
+
+        try {
+            f.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeContents(f, contents);
+        return;
+        }
+
         if (headCommit.blobID.contains(hashBlobID)){
             headCommit.blobID.remove(hashBlobID);
             file.delete();
+
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            writeContents(f, contents);
             return;
         }else{
             System.out.println("No reason to remove the file.");
