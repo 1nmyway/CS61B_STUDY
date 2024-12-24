@@ -184,7 +184,7 @@ public class Repository {
             //File file3 = new File(addstageFilePath);
             String hashBlobID = readContentsAsString(file3);
             blobIDList.add(hashBlobID); //在commit文件里存放blob id
-            rm2(fileName);           //删除addstage中的内容
+            file3.delete();          //删除addstage中的内容
         }
         Commit commit = new Commit(message, parents, date, blobIDList);//创建新的commit,作用是生成hashid
         String commitHashID = commit.generatelID();
@@ -207,6 +207,7 @@ public class Repository {
         //remove the file from the staging area
         String filePath = findFileRecursively(CWD, filename);
         File file = new File(filePath);
+        //System.out.println(filePath);
         String contents = readContentsAsString(file);
        Blob blob0 = new Blob();
        String hashBlobID = blob0.generatelID(contents);//得到hash id
@@ -214,6 +215,7 @@ public class Repository {
 
         if (join(ADDSTAGE_DIR, filename).exists()){
         join(ADDSTAGE_DIR, filename).delete();
+        //file.delete();
 
         try {
             f.createNewFile();
@@ -223,7 +225,7 @@ public class Repository {
         writeContents(f, contents);
         return;
         }
-
+        //System.out.println(headCommit.blobID+" "+hashBlobID);
         if (headCommit.blobID.contains(hashBlobID)){
             headCommit.blobID.remove(hashBlobID);
             file.delete();
