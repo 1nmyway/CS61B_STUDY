@@ -129,6 +129,7 @@ public class Repository {
                 //System.out.println(hashBlobID+" "+readContentsAsString(removeFile));
                 if (contents.equals(readContentsAsString(removeFile))) {
                     removeFile.delete();
+                    return;
                 }
             }
             File f4 = join(BLOB_DIR, hashBlobID);//新建blob目录下的储存blob的文件,名字使用hash id
@@ -173,29 +174,37 @@ public class Repository {
         List<String> blobIDList = new ArrayList<>();
         //String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
         //File f = new File(addstagePath);
-        List<String> fileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
-        if (fileNames.isEmpty()&&!is_changed) {
-            System.out.println("No changes added to the commit.");
-            return;
-        }
+        List<String> stagefileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
+        //System.out.println(is_changed);
+//        if (stagefileNames.isEmpty()&&!is_changed) {
+//            System.out.println("No changes added to the commit.");
+//            return;
+//        }
                                          //addstage中文件 文件名p.txt 内容 hash blobid
+
+       // readContentsAsString(join(REMOVESATGE_DIR,removeFileName)).equals(headCommitblobID)
         Commit headcommit=getCommitFromHead();//先把headcommit里的所有blob id加进来，除了addstage里有的
         List<String> headCommitblobIDList = headcommit.blobID;
+        List<String> removeFileNameList = Utils.plainFilenamesIn(REMOVESATGE_DIR);
         if (headCommitblobIDList!=null) {
             for (String headCommitblobID : headCommitblobIDList) {
-                for (int i = 0; i < fileNames.size(); i++) {
+                for (int i = 0; i < stagefileNames.size(); i++) {
                     //System.out.println(readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName+" "+fileNames.get(i));
-                    if (!readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName.equals(fileNames.get(i))) {
-                        blobIDList.add(headCommitblobID);
-                        //System.out.println(headCommitblobID);
+                    for (int j=0;j<removeFileNameList.size();j++) {
+                        if (!readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName.equals(stagefileNames.get(i))
+                                && !readContentsAsString(join(REMOVESATGE_DIR,removeFileNameList.get(j))).equals(headCommitblobID)) {
+                            blobIDList.add(headCommitblobID);
+                            //System.out.println(headCommitblobID);
+                            //System.out.println(headCommitblobID);
+                        }
                     }
                 }
             }
         }
 
-        if (!fileNames.isEmpty()) {
-            for (int i = 0; i < fileNames.size(); i++) {       //再把addstage里存在的blob id加进来
-                String fileName = fileNames.get(i);
+        if (!stagefileNames.isEmpty()) {
+            for (int i = 0; i < stagefileNames.size(); i++) {       //再把addstage里存在的blob id加进来
+                String fileName = stagefileNames.get(i);
 
                 File file3 = join(ADDSTAGE_DIR, fileName); //addstage目录下的文件
                 //File file4 = join(BLOB_DIR, fileName);//blob目录下的文件
@@ -251,14 +260,14 @@ public class Repository {
         return;
         }
         //System.out.println(headCommit.blobID+" "+hashBlobID);
-        if (headCommit.blobID.contains(hashBlobID)){   //从头提交中删除blob
-            headCommit.blobID.remove(hashBlobID);
+        if (headCommit.blobID.contains(hashBlobID)){   //删除工作目录中的文件
+            //headCommit.blobID.remove(hashBlobID);
             file.delete();
             if (join(ADDSTAGE_DIR, filename).exists()) {
                 join(ADDSTAGE_DIR, filename).delete();
             }
             try {
-                f.createNewFile();
+                f.createNewFile();         //从工作目录和stage中都删除，并且放入removestage
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
