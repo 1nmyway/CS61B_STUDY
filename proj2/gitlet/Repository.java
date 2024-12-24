@@ -120,8 +120,8 @@ public class Repository {
             File file = new File(filePath);
             String contents = readContentsAsString(file);
             Blob blob0 = new Blob();
-            System.out.println(filePath);
-            System.out.println("contens:"+contents);
+            //System.out.println(filePath);
+            //System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents);//得到hash id
             File removeFile = join(REMOVESATGE_DIR, filename);
             if(removeFile.exists()) {
@@ -503,7 +503,7 @@ public class Repository {
         if (!branch.exists()) {
             System.out.println("No such branch exists.");
         }
-        else if(currentBranch==branch) {
+        else if(currentBranch.equals(branch)) {
             System.out.println("No need to checkout the current branch.");
             return;
         } else {
@@ -552,7 +552,7 @@ public class Repository {
         if (!branch.exists()) {
             System.out.println("A branch with that name does not exist.");
             return;
-        }else if(readContents(branch).equals(readContents(HEAD_FILE))){
+        }else if(branch.equals(currentBranch)){
             System.out.println("Cannot remove the current branch.");
             return;
         }else{
@@ -560,7 +560,8 @@ public class Repository {
         }
     }
 
-    public static void reset(String ID){
+    public static void reset(String commitID){
+
     }
     public static void merge(String branchName){
     }
