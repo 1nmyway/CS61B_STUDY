@@ -175,7 +175,18 @@ public class Repository {
             System.out.println("No changes added to the commit.");
             return;
         }
-        for (int i = 0; i < fileNames.size(); i++) {
+                                            //addstage中文件 文件名p.txt 内容 hash blobid
+        Commit headcommit=getCommitFromHead();             //先把headcommit里的所有blob id加进来，除了addstage里有的
+        List<String> headCommitblobIDList = headcommit.blobID;
+        for (String headCommitblobID:headCommitblobIDList){
+            for (int i=0;i<fileNames.size();i++) {
+                if (readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName !=fileNames.get(i)){
+                    blobIDList.add(headCommitblobID);
+                }
+            }
+        }
+
+        for (int i = 0; i < fileNames.size(); i++) {       //再把addstage里存在的blob id加进来
             String fileName = fileNames.get(i);
 
             File file3 = join(ADDSTAGE_DIR, fileName); //addstage目录下的文件
@@ -183,9 +194,13 @@ public class Repository {
             //String blobPath = file4.getPath();    //.gitlet/objects/blob/Main.java
             //File file3 = new File(addstageFilePath);
             String hashBlobID = readContentsAsString(file3);
-            blobIDList.add(hashBlobID); //在commit文件里存放blob id
+            blobIDList.add(hashBlobID); //在commit文件里存放addstage中的blob id
+
             file3.delete();          //删除addstage中的内容
         }
+        //List<String> blobFileNames = Utils.plainFilenamesIn(BLOB_DIR);
+
+
         Commit commit = new Commit(message, parents, date, blobIDList);//创建新的commit,作用是生成hashid
         String commitHashID = commit.generatelID();
 
