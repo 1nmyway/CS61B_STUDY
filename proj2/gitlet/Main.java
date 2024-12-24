@@ -10,10 +10,15 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO: what if args is empty?
-        String firstArg = args[0];
         if (args.length == 0){
             System.out.println("Please enter a command.");
+            return;
+        }else if (!Repository.GITLET_DIR.exists()){
+            System.out.println("Not in an initialized Gitlet directory.");
+            return;
         }
+        String firstArg = args[0];
+
         switch(firstArg) {
             case "init":
                 // TODO: handle the `init` command

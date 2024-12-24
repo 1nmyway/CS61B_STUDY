@@ -344,7 +344,7 @@ public class Repository {
         Commit commit = readObject(f, Commit.class);
         while (!commit.ID.equals(" ")) {
             System.out.println("===");
-            System.out.println(commit.ID);
+            System.out.println(commit.ID.substring(0, 8));
             System.out.println(commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
@@ -372,25 +372,22 @@ public class Repository {
     }
 
     public static void globalLog() {
-        String commitHashID = readContentsAsString(Repository.HEAD_FILE);
-        File f = join(COMMIT_DIR, commitHashID);//头指针指向的commit
-        Commit commit = readObject(f, Commit.class);
-        while (!commit.ID.equals(" ")) {
+        //String commitHashID = readContentsAsString(Repository.HEAD_FILE);
+        //File f = join(COMMIT_DIR, commitHashID);//头指针指向的commit
+        List<String> commitFileNameList =  plainFilenamesIn(COMMIT_DIR);
+        for (String fileName : commitFileNameList)
+        {
+            File f = join(COMMIT_DIR, fileName);
+            Commit commit = readObject(f, Commit.class);
             System.out.println("===");
-            System.out.println(commit.ID);
+            System.out.println(commit.ID.substring(0,8));
             System.out.println(commit.timestamp);
             System.out.println(commit.message);
-            System.out.println(commit.parents);
-            System.out.println(commit.blobID);
-            System.out.println(commit.author);
-            System.out.println(commit.fileName);
+            //System.out.println(commit.parents);
+            //System.out.println(commit.blobID);
+            //System.out.println(commit.author);
+            //System.out.println(commit.fileName);
             System.out.print("\n");
-            try {
-                File f2 = join(COMMIT_DIR, commit.parents.get(0));
-                commit = readObject(f2, Commit.class);
-            } catch (IndexOutOfBoundsException e) {
-                break;
-            }
         }
     }
 
