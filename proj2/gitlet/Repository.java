@@ -217,19 +217,21 @@ public class Repository {
         join(ADDSTAGE_DIR, filename).delete();
         //file.delete();
 
-        try {
-            f.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        writeContents(f, contents);
+//        try {
+//            f.createNewFile();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        writeContents(f, contents);
         return;
         }
         //System.out.println(headCommit.blobID+" "+hashBlobID);
         if (headCommit.blobID.contains(hashBlobID)){
             headCommit.blobID.remove(hashBlobID);
             file.delete();
-
+            if (join(ADDSTAGE_DIR, filename).exists()) {
+                join(ADDSTAGE_DIR, filename).delete();
+            }
             try {
                 f.createNewFile();
             } catch (IOException e) {
