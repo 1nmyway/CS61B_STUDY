@@ -120,6 +120,8 @@ public class Repository {
             File file = new File(filePath);
             String contents = readContentsAsString(file);
             Blob blob0 = new Blob();
+            System.out.println(filePath);
+            System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents);//得到hash id
             File removeFile = join(REMOVESATGE_DIR, filename);
             if(removeFile.exists()) {
@@ -175,13 +177,17 @@ public class Repository {
             System.out.println("No changes added to the commit.");
             return;
         }
-                                            //addstage中文件 文件名p.txt 内容 hash blobid
-        Commit headcommit=getCommitFromHead();             //先把headcommit里的所有blob id加进来，除了addstage里有的
+                                         //addstage中文件 文件名p.txt 内容 hash blobid
+        Commit headcommit=getCommitFromHead();//先把headcommit里的所有blob id加进来，除了addstage里有的
         List<String> headCommitblobIDList = headcommit.blobID;
-        for (String headCommitblobID:headCommitblobIDList){
-            for (int i=0;i<fileNames.size();i++) {
-                if (readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName !=fileNames.get(i)){
-                    blobIDList.add(headCommitblobID);
+        if (headCommitblobIDList!=null) {
+            for (String headCommitblobID : headCommitblobIDList) {
+                for (int i = 0; i < fileNames.size(); i++) {
+                    //System.out.println(readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName+" "+fileNames.get(i));
+                    if (!readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName.equals(fileNames.get(i))) {
+                        blobIDList.add(headCommitblobID);
+                        //System.out.println(headCommitblobID);
+                    }
                 }
             }
         }
@@ -214,6 +220,7 @@ public class Repository {
         writeObject(f2, commit2);
         writeContents(Repository.HEAD_FILE, commitHashID);//把头指针指向commit
         writeContents(currentBranch, commitHashID);//当前分支指向head//TODO
+        //System.out.println(blobIDList);
     }
 
     public static void rm2(String filename) {
