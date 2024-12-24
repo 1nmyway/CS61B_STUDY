@@ -46,6 +46,7 @@ public class Repository {
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
 
     public static File currentBranch = MASTER_DIR;
+    public static boolean is_changed = false;
 
 
     /* TODO: fill in the rest of this class. */
@@ -173,7 +174,7 @@ public class Repository {
         //String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
         //File f = new File(addstagePath);
         List<String> fileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
-        if (fileNames.isEmpty()) {
+        if (fileNames.isEmpty()&&!is_changed) {
             System.out.println("No changes added to the commit.");
             return;
         }
@@ -192,17 +193,19 @@ public class Repository {
             }
         }
 
-        for (int i = 0; i < fileNames.size(); i++) {       //再把addstage里存在的blob id加进来
-            String fileName = fileNames.get(i);
+        if (!fileNames.isEmpty()) {
+            for (int i = 0; i < fileNames.size(); i++) {       //再把addstage里存在的blob id加进来
+                String fileName = fileNames.get(i);
 
-            File file3 = join(ADDSTAGE_DIR, fileName); //addstage目录下的文件
-            //File file4 = join(BLOB_DIR, fileName);//blob目录下的文件
-            //String blobPath = file4.getPath();    //.gitlet/objects/blob/Main.java
-            //File file3 = new File(addstageFilePath);
-            String hashBlobID = readContentsAsString(file3);
-            blobIDList.add(hashBlobID); //在commit文件里存放addstage中的blob id
+                File file3 = join(ADDSTAGE_DIR, fileName); //addstage目录下的文件
+                //File file4 = join(BLOB_DIR, fileName);//blob目录下的文件
+                //String blobPath = file4.getPath();    //.gitlet/objects/blob/Main.java
+                //File file3 = new File(addstageFilePath);
+                String hashBlobID = readContentsAsString(file3);
+                blobIDList.add(hashBlobID); //在commit文件里存放addstage中的blob id
 
-            file3.delete();          //删除addstage中的内容
+                file3.delete();          //删除addstage中的内容
+            }
         }
         //List<String> blobFileNames = Utils.plainFilenamesIn(BLOB_DIR);
 
@@ -248,7 +251,7 @@ public class Repository {
         return;
         }
         //System.out.println(headCommit.blobID+" "+hashBlobID);
-        if (headCommit.blobID.contains(hashBlobID)){
+        if (headCommit.blobID.contains(hashBlobID)){   //从头提交中删除blob
             headCommit.blobID.remove(hashBlobID);
             file.delete();
             if (join(ADDSTAGE_DIR, filename).exists()) {
@@ -260,6 +263,7 @@ public class Repository {
                 throw new RuntimeException(e);
             }
             writeContents(f, contents);
+            is_changed = true;
             return;
         }else{
             System.out.println("No reason to remove the file.");
