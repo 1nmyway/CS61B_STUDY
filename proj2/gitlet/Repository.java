@@ -133,6 +133,29 @@ public class Repository {
         return null;
     }
 
+    private static String findFileRecursivelyParent(File directory, String fileName) {
+        // 列出目录中的所有文件和子目录
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                // 如果是文件且文件名匹配，则打印文件路径并返回
+                if (file.isFile() && file.getName().equalsIgnoreCase(fileName)) {
+                    return file.getParent();
+                }
+                // 如果是子目录，则递归查找并检查返回值
+                else if (file.isDirectory()) {
+                    String result = findFileRecursivelyParent(file, fileName);
+                    if (result != null) {
+                        return result; // 如果递归调用找到了文件，则返回其路径
+                    }
+                }
+            }
+        }
+        // 如果没有找到文件，则返回null
+        return null;
+    }
+
     public static void add(String filename) {
 
         String filePath = findFileRecursively(CWD, filename);
@@ -575,8 +598,15 @@ public class Repository {
              //头指针指向分支指向的commit
 
             List<File> blobfiles = getBlobFileListFromCommit(commit);
+            //System.out.println("sad "+blobfiles);
 
+            //File testfile = join(CWD, "test");
             File[] files = CWD.listFiles();
+            //findFileRecursivelyParent(CWD, "test");
+            if (hasUntrackedFiles()){
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                return;
+            }
 
             if (files != null) {
                 for (File file : files) {
@@ -592,10 +622,7 @@ public class Repository {
             }
 
             //System.out.println(files);
-            if (hasUntrackedFiles()){
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                return;
-            }
+
             for (File blobfile : blobfiles) {
                 //System.out.println(file.getPath());
                 Blob blob = readObject(blobfile, Blob.class);
@@ -632,6 +659,7 @@ public class Repository {
         }
 
     public static boolean hasUntrackedFiles() {
+        //File testfile = join(CWD, "test");
         File[] workingFiles = CWD.listFiles();
         List<String> blobNames = plainFilenamesIn(BLOB_DIR);
         List<String> trackedFiles = new ArrayList<>();
