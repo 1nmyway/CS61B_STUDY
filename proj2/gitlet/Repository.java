@@ -498,9 +498,11 @@ public class Repository {
     }
     public static List<File> getBlobFileListFromCommit(Commit commit){
         List<File> blobFilesList = new ArrayList<>();
-        for (String blobID : commit.blobID){
-            blobFilesList.add(join(BLOB_DIR, blobID));
-            //System.out.println(blobID);
+        if (commit.blobID!=null) {
+            for (String blobID : commit.blobID) {
+                blobFilesList.add(join(BLOB_DIR, blobID));
+                //System.out.println(blobID);
+            }
         }
 //        for (File file: blobFilesList){
 //            Blob
