@@ -147,17 +147,23 @@ public class Repository {
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents);//得到hash id
-            if (commit.blobID!=null && commit.blobID.contains(hashBlobID)){ //如果两次add的文件完全一致，则不添加
-                return;
-            }
-            File removeFile = join(REMOVESATGE_DIR, filename);
-            if(removeFile.exists()) {
-                //System.out.println(hashBlobID+" "+readContentsAsString(removeFile));
-                if (hashBlobID.equals(readContentsAsString(removeFile))) {
-                    removeFile.delete();
+            if (commit.blobID!=null) {
+                if (commit.blobID.contains(hashBlobID)) { //如果两次add的文件完全一致，则不添加
                     return;
                 }
             }
+            File removeFile = join(REMOVESATGE_DIR, filename);
+            if (removeFile.getName().equals(filename)){  //如果文件名相同就删除
+                removeFile.delete();
+                return;
+            }
+//            if(removeFile.exists()) {
+//                System.out.println(hashBlobID+" "+readContentsAsString(removeFile));
+//                if (hashBlobID.equals(readContentsAsString(removeFile))) {
+//                    removeFile.delete();
+//                    return;
+//                }
+//            }
             File f4 = join(BLOB_DIR, hashBlobID);//新建blob目录下的储存blob的文件,名字使用hash id
             try {
                 f4.createNewFile();
@@ -288,24 +294,26 @@ public class Repository {
 //        writeContents(f, contents);
         return;
         }
-        //System.out.println(headCommit.blobID+" "+hashBlobID);
-        if (headCommit.blobID.contains(hashBlobID)){   //删除工作目录中的文件
-            //headCommit.blobID.remove(hashBlobID);
-            file.delete();
-            if (join(ADDSTAGE_DIR, filename).exists()) {
-                join(ADDSTAGE_DIR, filename).delete();
+        //System.out.println(headCommit.blobID+" "+hashBlobID);//删除工作目录中的文件
+        if (headCommit.blobID!=null) {
+            if (headCommit.blobID.contains(hashBlobID)) {
+                //headCommit.blobID.remove(hashBlobID);
+                file.delete();
+                if (join(ADDSTAGE_DIR, filename).exists()) {
+                    join(ADDSTAGE_DIR, filename).delete();
+                }
+                try {
+                    f.createNewFile();         //从工作目录和stage中都删除，并且放入removestage
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                writeContents(f, hashBlobID); //removestage中的文件存放hash id
+                is_changed = true;
+                return;
+            } else {
+                System.out.println("No reason to remove the file.");
+                return;
             }
-            try {
-                f.createNewFile();         //从工作目录和stage中都删除，并且放入removestage
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            writeContents(f, hashBlobID); //removestage中的文件存放hash id
-            is_changed = true;
-            return;
-        }else{
-            System.out.println("No reason to remove the file.");
-            return;
         }
 
 
