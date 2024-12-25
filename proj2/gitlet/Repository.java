@@ -279,6 +279,13 @@ public class Repository {
         File f = join(REMOVESATGE_DIR, filename);
         //remove the file from the staging area
         String filePath = findFileRecursively(CWD, filename);
+        if (filePath == null){
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         File file = new File(filePath);
         //System.out.println(filePath);
         String contents = readContentsAsString(file);
@@ -311,10 +318,10 @@ public class Repository {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                writeContents(f, hashBlobID); //removestage中的文件存放hash id
+                writeContents(f, hashBlaobID); //removestage中的文件存放hash id
                 is_changed = true;
                 return;
-            } 
+            }
             }else {
             System.out.println("No reason to remove the file.");
             return;
