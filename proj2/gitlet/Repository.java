@@ -686,15 +686,20 @@ public class Repository {
     public static boolean hasUntrackedFiles() {
         //File testfile = join(CWD, "test");
         File[] workingFiles = CWD.listFiles();
-        List<String> blobNames = plainFilenamesIn(BLOB_DIR);
+        //List<String> blobNames = plainFilenamesIn(BLOB_DIR);
         List<String> trackedFiles = new ArrayList<>();
-        for (String track : blobNames){
-            Blob blob = readObject(join(BLOB_DIR, track), Blob.class);
+//        for (String track : blobNames){
+//            Blob blob = readObject(join(BLOB_DIR, track), Blob.class);
+//            trackedFiles.add(blob.fileName);
+//        }
+        Commit commit = getCommitFromHead();
+        List<String> trackedFileBlobIDs = commit.blobID;
+        for (String trackedFileBlobID : trackedFileBlobIDs){
+            Blob blob = readObject(join(BLOB_DIR, trackedFileBlobID), Blob.class);
             trackedFiles.add(blob.fileName);
         }
         for (File file : workingFiles) {
             if (file.isFile()) {
-                // 如果文件不在暂存区中，则视为未跟踪文件
                 if (!trackedFiles.contains(file.getName())) {
                     //System.out.println("Untracked file found: " + file.getName());
                     return true;  // 发现未跟踪的文件
