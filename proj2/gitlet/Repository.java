@@ -318,7 +318,7 @@ public class Repository {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                writeContents(f, hashBlaobID); //removestage中的文件存放hash id
+                writeContents(f, hashBlobID); //removestage中的文件存放hash id
                 is_changed = true;
                 return;
             }
