@@ -45,7 +45,7 @@ public class Repository {
     public static final File REMOVESATGE_DIR = join(GITLET_DIR, "removestage");
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
 
-    public static File currentBranch = join(HEADS_DIR, "currentBranch");
+    public static File currentBranch = join(REFS_DIR, "currentBranch");
     public static boolean is_changed ;
 
 
