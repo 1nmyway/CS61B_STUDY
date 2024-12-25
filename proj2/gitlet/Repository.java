@@ -273,7 +273,7 @@ public class Repository {
         //System.out.println(filePath);
         String contents = readContentsAsString(file);
        Blob blob0 = new Blob();
-       String hashBlobID = blob0.generatelID(contents);//得到hash id
+       String hashBlobID = blob0.generatelID(contents);//得到工作目录中文件的hash id
         Commit headCommit = getCommitFromHead();
 
         if (join(ADDSTAGE_DIR, filename).exists()){
@@ -300,7 +300,7 @@ public class Repository {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            writeContents(f, contents);
+            writeContents(f, hashBlobID); //removestage中的文件存放hash id
             is_changed = true;
             return;
         }else{
