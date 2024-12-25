@@ -597,7 +597,7 @@ public class Repository {
     public static void checkout2(String ID,String fileName) {
         List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
         for(String commitfilesName : commitfilesNames){
-            if (commitfilesName.substring(0, 8).equals(ID)|| commitfilesName.equals(ID)){
+            if (commitfilesName.startsWith(ID)){
                 Commit commit = readObject(join(COMMIT_DIR, commitfilesName), Commit.class);
                 checkout(commit, fileName);
                 return;
