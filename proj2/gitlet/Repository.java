@@ -633,8 +633,8 @@ public class Repository {
                 blobfileNames.add(blob.fileName);
             }
 
-            File testfile = join(CWD, "test");
-            File[] files = testfile.listFiles();
+            //File testfile = join(CWD, "test");
+            File[] files = CWD.listFiles();
             //findFileRecursivelyParent(CWD, "test");
 
 
@@ -685,9 +685,9 @@ public class Repository {
         }
 
     public static boolean hasUntrackedFiles() {
-        File testfile = join(CWD, "test");
 
-        File[] workingFiles = testfile.listFiles();
+
+        File[] workingFiles = CWD.listFiles();
 
         List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
         if (blobIDs==null){
