@@ -539,7 +539,7 @@ public class Repository {
     public static void checkout2(String ID,String fileName) {
         List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
         for(String commitfilesName : commitfilesNames){
-            if (commitfilesName.substring(0, 8).equals(ID)){
+            if (commitfilesName.substring(0, 8).equals(ID)|| commitfilesName.equals(ID)){
                 Commit commit = readObject(join(COMMIT_DIR, commitfilesName), Commit.class);
                 checkout(commit, fileName);
                 return;
@@ -562,26 +562,27 @@ public class Repository {
             String headCommitID = readContentsAsString(branch); //提取分支指针指向的commit
             Commit commit = readObject(join(COMMIT_DIR, headCommitID), Commit.class);//葱commit目录读取分支的提取commit对象
             writeContents(HEAD_FILE, headCommitID);
+            if (commit.blobID!=null) {
+                for (String fileName : commit.blobID) {  //从commit里拿blobid
 
-            for (String fileName : commit.blobID) {  //从commit里拿blobid
+                    File f2 = join(BLOB_DIR, fileName); //找到blob对象
+                    Blob blob = readObject(f2, Blob.class);
 
-                File f2 = join(BLOB_DIR, fileName); //找到blob对象
-                Blob blob = readObject(f2, Blob.class);
+                    String filePath = findFileRecursively(CWD, blob.fileName);
+                    File workfile = new File(filePath);   //工作目录中要修改的文件
 
-                String filePath = findFileRecursively(CWD, blob.fileName);
-                File workfile = new File(filePath);   //工作目录中要修改的文件
-
-                String contents = readContentsAsString(workfile);
-                String workfileName = blob.fileName;
-                Blob blob2 = new Blob();
-                String workFileBlobID = blob2.generatelID(contents,workfileName);
-                String currentBranchCommitID = readContentsAsString(currentBranch);
-                Commit currentBranchCommit =readObject(join(COMMIT_DIR, currentBranchCommitID), Commit.class);
-                if (!currentBranchCommit.blobID.contains(workFileBlobID)) {
-                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                }
+                    String contents = readContentsAsString(workfile);
+                    String workfileName = blob.fileName;
+                    Blob blob2 = new Blob();
+                    String workFileBlobID = blob2.generatelID(contents, workfileName);
+                    String currentBranchCommitID = readContentsAsString(currentBranch);
+                    Commit currentBranchCommit = readObject(join(COMMIT_DIR, currentBranchCommitID), Commit.class);
+                    if (!currentBranchCommit.blobID.contains(workFileBlobID)) {
+                        System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    }
                     writeContents(workfile, blob.fileContent);
                 }
+            }
                  //currentBranch = branch;
                  writeObject(currentBranch, branch);
             }
