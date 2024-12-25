@@ -147,7 +147,7 @@ public class Repository {
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents);//得到hash id
-            if (commit.blobID.contains(hashBlobID)){
+            if (commit.blobID!=null && commit.blobID.contains(hashBlobID)){
                 return;
             }
             File removeFile = join(REMOVESATGE_DIR, filename);
@@ -207,7 +207,7 @@ public class Repository {
             return;
         }
         deleteAllFiles(REMOVESATGE_DIR); //清空removestage
-        
+
                                          //addstage中文件 文件名p.txt 内容 hash blobid
 
        // readContentsAsString(join(REMOVESATGE_DIR,removeFileName)).equals(headCommitblobID)
