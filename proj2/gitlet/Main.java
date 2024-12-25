@@ -56,16 +56,21 @@ public class Main {
                 Repository.status();
                 break;
             case "checkout":
-                if (args.length==3){
-                    Repository.checkout1(args[2]);
-                }else if (args.length==4) {
-                    Repository.checkout2(args[1], args[3]);
-                }
-                else if (args.length==2){
-                    Repository.checkout3(args[1]);
-                }else{
 
-                }
+                if (args.length == 2) {
+                    // `checkout [branch name]`
+                    String branchName = args[1];
+                    Repository.checkout3(branchName);
+                } else if (args.length == 3 && args[1].equals("--")) {
+                    // `checkout -- [file name]`
+                    String fileName = args[2];
+                    Repository.checkout1(fileName);
+                } else if (args.length == 4 && args[2].equals("--")) {
+                    // `checkout [commit id] -- [file name]`
+                    String commitId = args[1];
+                    String fileName = args[3];
+                    Repository.checkout2(commitId, fileName);
+                } 
 
                 break;
             case "branch":
