@@ -456,60 +456,50 @@ public class Repository {
 //        }
         return blobFilesList;
     }
+    public static void checkout(Commit commit,String fileName) {
+
+        String filePath = findFileRecursively(CWD, fileName);
+            File f = new File(filePath);   //要修改的文件，工作目录中
+            //commit.pathToBlobID.get(fileName);
+            List<File> files = getBlobFileListFromCommit(commit);
+            //System.out.println(files);
+            for (File file : files)
+            {
+                //System.out.println(file.getPath());
+                Blob blob = readObject(file, Blob.class);
+                if (blob.fileName.equals(fileName)){
+                    writeContents(f, blob.fileContent);
+                    //System.out.println("content:"+blob.fileContent);
+                    //System.out.println("filename:"+blob.fileName);
+                }
+            }
+        }
+
 
     public static void checkout1(String fileName) { //只换指定的文件
     //String head = readContentsAsString(HEAD_FILE); //提取头指针指向的commit
         Commit headCommit = getCommitFromHead();
-    String filePath = findFileRecursively(CWD, fileName);
-    if (headCommit.blobID.size() != 0) {
-        File f = new File(filePath);   //要修改的文件，工作目录中
-        //commit.pathToBlobID.get(fileName);
-        List<File> files = getBlobFileListFromCommit(headCommit);
-        Blob blob=new Blob();
-        //System.out.println(files);
-        for (File file : files)
-        {
-            System.out.println(file.getPath());
-            blob = readObject(file, Blob.class);
-            if (blob.fileName.equals(fileName)){
-                writeContents(f, blob.fileContent);
-                System.out.println("content:"+blob.fileContent);
-                System.out.println("filename:"+blob.fileName);
-            }
-        }
-
+        if (headCommit.blobID.size() != 0) {
+            checkout(headCommit, fileName);
         }else{
         System.out.println("File does not exist in that commit.");
     }
     }
     public static void checkout2(String ID,String fileName) {
-        Commit commit = getCommitFromHead();
-        while (true) {
-            if (commit.ID.equals(ID)) {
-                String filePath = findFileRecursively(CWD, fileName);
-                File f = new File(filePath);   //要修改的文件
-                //commit.pathToBlobID.get(fileName);
-                List<File> files = getBlobFileListFromCommit(commit);
-                for (File file : files)
-                {
-                    Blob blob = readObject(file, Blob.class);
-                    if (blob.fileName.equals(fileName)){
-                        writeContents(f, blob.fileContent);
-                    }
-                }
-                return;
-            }
-            try {
-                File f2 = join(COMMIT_DIR, commit.parents.get(0));
-                commit = readObject(f2, Commit.class);
-            } catch (IndexOutOfBoundsException e) {
-                System.out.println("No commit with that id exists.");
+        List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
+        for(String commitfilesName : commitfilesNames){
+            if (commitfilesName.substring(0, 6).equals(ID)){
+                Commit commit = readObject(join(COMMIT_DIR, commitfilesName), Commit.class);
+                checkout(commit, fileName);
                 return;
             }
         }
+        System.out.println("No commit with that id exists.");
     }
     public static void checkout3(String branchName) {
-        File branch = join(HEADS_DIR, branchName);
+        File branch = join(HEADS_DIR, branchName); //提取分支指针指向的commit
+        String currentCommitID = readContentsAsString(currentBranch);
+
         if (!branch.exists()) {
             System.out.println("No such branch exists.");
         }
@@ -517,7 +507,7 @@ public class Repository {
             System.out.println("No need to checkout the current branch.");
             return;
         } else {
-            currentBranch = branch;
+
             String headCommitID = readContentsAsString(branch); //提取分支指针指向的commit
             Commit commit = readObject(join(COMMIT_DIR, headCommitID), Commit.class);//葱commit目录读取分支的提取commit对象
             writeContents(HEAD_FILE, headCommitID);
@@ -529,15 +519,18 @@ public class Repository {
 
                 String filePath = findFileRecursively(CWD, blob.fileName);
                 File workfile = new File(filePath);   //工作目录中要修改的文件
-//                String contents = readContentsAsString(f);
-//                Blob blob0 = new Blob();
-//                String hashBlobID = blob0.generatelID(contents);//得到hash id
-//                if (!commit.blobID.contains(hashBlobID)){
-//                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-//                    return;
-//                }
+
+                String contents = readContentsAsString(workfile);
+                Blob blob2 = new Blob();
+                String workFileBlobID = blob2.generatelID(contents);
+                String currentBranchCommitID = readContentsAsString(currentBranch);
+                Commit currentBranchCommit =readObject(join(COMMIT_DIR, currentBranchCommitID), Commit.class);
+                if (!currentBranchCommit.blobID.contains(workFileBlobID)) {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                }
                     writeContents(workfile, blob.fileContent);
                 }
+                 currentBranch = branch;
             }
         }
 
@@ -571,7 +564,36 @@ public class Repository {
     }
 
     public static void reset(String commitID){
+    List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
+    if (!commitfilesNames.contains(commitID)){
+        System.out.println("No commit with that id exists.");
+        return;
+    }
 
+    Commit commit = readObject(join(COMMIT_DIR, commitID), Commit.class);
+        List<String> blobIDList = commit.blobID;
+        for (String blobID : blobIDList){
+            //File f2 = join(BLOB_DIR, blobID);
+            //Blob blob=readObject(f2, Blob.class);
+            deleteAllFilesExceptTracked(blobID);
+        }
+        writeContents(currentBranch, commitID);
+    }
+    public static void deleteAllFilesExceptTracked(String blobID) {
+        // 获取工作目录中的所有文件和子目录
+        File[] files = CWD.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                String c = readContentsAsString(file);
+                Blob blob =new Blob();
+                String fileblobID = blob.generatelID(c);
+                if (!fileblobID.equals(blobID)) {
+                    //System.out.println("Deleting file: " + file.getName());
+                    file.delete();
+                }
+            }
+        }
     }
     public static void merge(String branchName){
     }
