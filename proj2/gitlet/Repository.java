@@ -617,7 +617,12 @@ public class Repository {
              //头指针指向分支指向的commit
 
             List<File> blobfiles = getBlobFileListFromCommit(commit);
+            List<String> blobfileNames = new ArrayList<String>();
             //System.out.println("sad "+blobfiles);
+            for (File file5 : blobfiles){
+                Blob blob = readObject(file5, Blob.class);
+                blobfileNames.add(blob.fileName);
+            }
 
             //File testfile = join(CWD, "test");
             File[] files = CWD.listFiles();
@@ -630,12 +635,8 @@ public class Repository {
             if (files != null) {
                 for (File file : files) {
                     String f = file.getName(); //工作目录中的文件
-                    for (File file2 : blobfiles) {
-                        Blob blob = readObject(file2, Blob.class);
-                        if (!f.equals(blob.fileName)) {            //文件名相同的文件不删除//TODO
-                            //System.out.println("Deleting file: " + file.getName());
-                            file.delete();
-                        }
+                    if (!blobfileNames.contains(f)){
+                        file.delete();
                     }
                 }
             }
