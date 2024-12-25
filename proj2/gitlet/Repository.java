@@ -597,7 +597,7 @@ public class Repository {
     public static void checkout2(String ID,String fileName) {
         List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
         for(String commitfilesName : commitfilesNames){
-            if (commitfilesName.substring(0, 8).equals(ID)|| commitfilesName.equals(ID)){
+            if (commitfilesName.substring(0, 7).equals(ID)|| commitfilesName.equals(ID)){
                 Commit commit = readObject(join(COMMIT_DIR, commitfilesName), Commit.class);
                 checkout(commit, fileName);
                 return;
@@ -694,6 +694,7 @@ public class Repository {
 //        }
         Commit commit = getCommitFromHead();
         List<String> trackedFileBlobIDs = commit.blobID;
+
         for (String trackedFileBlobID : trackedFileBlobIDs){
             Blob blob = readObject(join(BLOB_DIR, trackedFileBlobID), Blob.class);
             trackedFiles.add(blob.fileName);
