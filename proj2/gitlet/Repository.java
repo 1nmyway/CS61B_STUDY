@@ -576,20 +576,20 @@ public class Repository {
 
             List<File> blobfiles = getBlobFileListFromCommit(commit);
 
-            //File[] files = CWD.listFiles();
+            File[] files = CWD.listFiles();
 
-//            if (files != null) {
-//                for (File file : files) {
-//                    String f = file.getName();
-//                    for (File file2 : blobfiles) {
-//                        Blob blob = readObject(file, Blob.class);
-//                        if (!f.equals(blob.fileName)) {            //文件名相同的文件不删除//TODO
-//                            //System.out.println("Deleting file: " + file.getName());
-//                            file.delete();
-//                        }
-//                    }
-//                }
-//            }
+            if (files != null) {
+                for (File file : files) {
+                    String f = file.getName(); //工作目录中的文件
+                    for (File file2 : blobfiles) {
+                        Blob blob = readObject(file2, Blob.class);
+                        if (!f.equals(blob.fileName)) {            //文件名相同的文件不删除//TODO
+                            //System.out.println("Deleting file: " + file.getName());
+                            file.delete();
+                        }
+                    }
+                }
+            }
 
             //System.out.println(files);
             if (hasUntrackedFiles()){
@@ -600,7 +600,7 @@ public class Repository {
                 //System.out.println(file.getPath());
                 Blob blob = readObject(blobfile, Blob.class);
 
-                writeContents(join(CWD, blob.fileName), blob.fileContent);
+                writeContents(join(CWD, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
             }
             writeObject(currentBranch, branch);
             writeContents(HEAD_FILE, headCommitID);
@@ -643,7 +643,7 @@ public class Repository {
             if (file.isFile()) {
                 // 如果文件不在暂存区中，则视为未跟踪文件
                 if (!trackedFiles.contains(file.getName())) {
-                    System.out.println("Untracked file found: " + file.getName());
+                    //System.out.println("Untracked file found: " + file.getName());
                     return true;  // 发现未跟踪的文件
                 }
             }
