@@ -32,8 +32,8 @@ public class Blob implements Serializable {
     //public byte[] getBytes() {
 //        return Utils.readContents(fileName);
 //    }
-    public String generatelID(String fileContent){
-        return Utils.sha1(fileContent);
+    public String generatelID(String fileContent,String fileName){
+        return Utils.sha1(fileContent,fileName);
     }
     //tttt
 }

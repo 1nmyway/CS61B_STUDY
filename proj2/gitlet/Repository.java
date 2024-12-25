@@ -143,10 +143,11 @@ public class Repository {
         } else {
             File file = new File(filePath);
             String contents = readContentsAsString(file);
+            String fileName = file.getName();
             Blob blob0 = new Blob();
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
-            String hashBlobID = blob0.generatelID(contents);//得到hash id
+            String hashBlobID = blob0.generatelID(contents,fileName);//得到hash id
             if (commit.blobID!=null) {
                 if (commit.blobID.contains(hashBlobID)) { //如果两次add的文件完全一致，则不添加
                     //System.out.println(commit.blobID+" "+hashBlobID+"666");
@@ -285,12 +286,14 @@ public class Repository {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            return;
         }
         File file = new File(filePath);
         //System.out.println(filePath);
         String contents = readContentsAsString(file);
+        String workfileName = file.getName();
        Blob blob0 = new Blob();
-       String hashBlobID = blob0.generatelID(contents);//得到工作目录中文件的hash id
+       String hashBlobID = blob0.generatelID(contents,workfileName);//得到工作目录中文件的hash id
         Commit headCommit = getCommitFromHead();
 
         if (join(ADDSTAGE_DIR, filename).exists()){
@@ -569,8 +572,9 @@ public class Repository {
                 File workfile = new File(filePath);   //工作目录中要修改的文件
 
                 String contents = readContentsAsString(workfile);
+                String workfileName = blob.fileName;
                 Blob blob2 = new Blob();
-                String workFileBlobID = blob2.generatelID(contents);
+                String workFileBlobID = blob2.generatelID(contents,workfileName);
                 String currentBranchCommitID = readContentsAsString(currentBranch);
                 Commit currentBranchCommit =readObject(join(COMMIT_DIR, currentBranchCommitID), Commit.class);
                 if (!currentBranchCommit.blobID.contains(workFileBlobID)) {
@@ -635,8 +639,9 @@ public class Repository {
         if (files != null) {
             for (File file : files) {
                 String c = readContentsAsString(file);
+                String f = file.getName();
                 Blob blob =new Blob();
-                String fileblobID = blob.generatelID(c);
+                String fileblobID = blob.generatelID(c,f);
                 if (!fileblobID.equals(blobID)) {
                     //System.out.println("Deleting file: " + file.getName());
                     file.delete();
