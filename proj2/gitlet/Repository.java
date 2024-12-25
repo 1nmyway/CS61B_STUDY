@@ -201,8 +201,9 @@ public class Repository {
         //String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
         //File f = new File(addstagePath);
         List<String> stagefileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
+        List<String> removeFileNames = Utils.plainFilenamesIn(REMOVESATGE_DIR);//从removestage暂存区中提取所有的文件名
         //System.out.println(is_changed);
-        if (stagefileNames.isEmpty()) {
+        if (stagefileNames.isEmpty()&&removeFileNames.isEmpty()) {
             System.out.println("No changes added to the commit.");
             return;
         }
