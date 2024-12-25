@@ -592,8 +592,7 @@ public class Repository {
 //            }
 
             //System.out.println(files);
-            List<String> fileNames = plainFilenamesIn(CWD);
-            if (fileNames.size()>blobfiles.size()){
+            if (hasUntrackedFiles()){
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
@@ -631,6 +630,27 @@ public class Repository {
 
             }
         }
+
+    public static boolean hasUntrackedFiles() {
+        File[] workingFiles = CWD.listFiles();
+        List<String> blobNames = plainFilenamesIn(BLOB_DIR);
+        List<String> trackedFiles = new ArrayList<>();
+        for (String track : blobNames){
+            Blob blob = readObject(join(BLOB_DIR, track), Blob.class);
+            trackedFiles.add(blob.fileName);
+        }
+        for (File file : workingFiles) {
+            if (file.isFile()) {
+                // 如果文件不在暂存区中，则视为未跟踪文件
+                if (!trackedFiles.contains(file.getName())) {
+                    System.out.println("Untracked file found: " + file.getName());
+                    return true;  // 发现未跟踪的文件
+                }
+            }
+        }
+
+        return false;  // 没有未跟踪文件
+    }
 
 
     public static void branch(String branchName){
