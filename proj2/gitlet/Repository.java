@@ -450,7 +450,7 @@ public class Repository {
             File f = join(COMMIT_DIR, fileName);
             Commit commit = readObject(f, Commit.class);
             if (commit.message.equals(message)) {
-                System.out.println(commit.ID);
+                System.out.println(commit.ID.substring(0, 8));
                 num++;
             }
         }
