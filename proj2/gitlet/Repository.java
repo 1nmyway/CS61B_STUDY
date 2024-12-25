@@ -508,9 +508,8 @@ public class Repository {
         return blobFilesList;
     }
     public static void checkout(Commit commit,String fileName) {
-
+         int a=0;
         String filePath = findFileRecursively(CWD, fileName);
-        if (filePath != null) {
             File f = new File(filePath);                       //要修改的文件，工作目录中
             //commit.pathToBlobID.get(fileName);
             List<File> files = getBlobFileListFromCommit(commit);
@@ -520,11 +519,15 @@ public class Repository {
                 Blob blob = readObject(file, Blob.class);
                 if (blob.fileName.equals(fileName)) {
                     writeContents(f, blob.fileContent);
+                    a=1;
                     //System.out.println("content:"+blob.fileContent);
                     //System.out.println("filename:"+blob.fileName);
                 }
             }
-        }
+            if (a==0){
+                System.out.println("File does not exist in that commit.");
+            }
+
         }
 
 
