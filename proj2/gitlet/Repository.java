@@ -294,14 +294,26 @@ public class Repository {
         }
         writeObject(f2, commit2);
         writeContents(Repository.HEAD_FILE, commitHashID);//把头指针指向commit
-        writeContents(readObject(currentBranch,File.class), commitHashID);//当前分支指向head//TODO
+        //writeContents(readObject(currentBranch,File.class), commitHashID);//当前分支指向head//TODO
 
-        List<String> branchNames = plainFilenamesIn(HEADS_DIR);
-        for (String branchName : branchNames)
-        if (readObject(currentBranch,File.class).equals(MASTER_DIR)
-                &&readContentsAsString(MASTER_DIR).equals(readContentsAsString(join(HEADS_DIR, branchName)))){
-            writeContents(join(HEADS_DIR, branchName),readContentsAsString(MASTER_DIR));
+        List<String> branchNames = new ArrayList<>(plainFilenamesIn(HEADS_DIR));
+        branchNames.remove("master");
+
+        for (String branchName : branchNames) {
+//            System.out.println(readObject(currentBranch, File.class).equals(MASTER_DIR)+" "
+//                    +readContentsAsString(MASTER_DIR).equals(readContentsAsString(join(HEADS_DIR, branchName))));
+//            System.out.println(readContentsAsString(MASTER_DIR)+"  "+readContentsAsString(join(HEADS_DIR, branchName)) );
+            if (readObject(currentBranch, File.class).equals(MASTER_DIR) //如果当前分支是主分支，并且主分支内容和分支的内容一样
+                    && readContentsAsString(MASTER_DIR).equals(readContentsAsString(join(HEADS_DIR, branchName)))) {
+                writeContents(MASTER_DIR, commitHashID);
+                writeContents(join(HEADS_DIR, branchName), commitHashID);
+            }
         }
+        if(!readObject(currentBranch, File.class).equals(MASTER_DIR)){
+            writeContents(currentBranch, commitHashID);
+        }
+
+
         //System.out.println(blobIDList);
     }
 

@@ -104,6 +104,7 @@ public class Commit implements Serializable {
         }
         writeObject(f, initCommit);//把initcommit对象写入文件
         writeContents(Repository.HEAD_FILE, initCommitHashID);//把头指针指向初始化的commit
+        writeContents(Repository.MASTER_DIR, initCommitHashID);
     }
 
 
