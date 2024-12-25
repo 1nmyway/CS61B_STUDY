@@ -10,12 +10,17 @@ public class Main {
      */
     public static void main(String[] args) {
         // TODO: what if args is empty?
+
         if (args.length == 0){
             System.out.println("Please enter a command.");
             return;
 //        }else if (!Repository.GITLET_DIR.exists()){
 //            System.out.println("Not in an initialized Gitlet directory.");
 //            return;
+        }
+        if (!Repository.isInitialized()&&!args[0].equals("init")) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            return; // 如果没有初始化，直接返回，停止执行其他命令
         }
         String firstArg = args[0];
 
@@ -74,6 +79,12 @@ public class Main {
                 break;
             case "merge":
                 Repository.rm(args[1]);
+                break;
+            case "a":
+                Repository.a();
+                break;
+            case "b":
+                Repository.b();
                 break;
             default:
                 System.out.println("No command with that name exists.");

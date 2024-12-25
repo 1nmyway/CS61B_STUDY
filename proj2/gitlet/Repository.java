@@ -45,8 +45,16 @@ public class Repository {
     public static final File REMOVESATGE_DIR = join(GITLET_DIR, "removestage");
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
 
-    public static File currentBranch = MASTER_DIR;
-    public static boolean is_changed = false;
+    public static File currentBranch = join(HEADS_DIR, "currentBranch");
+    public static boolean is_changed ;
+
+
+    public static void a(){
+        is_changed=true;
+    }
+    public static void b () {
+        System.out.println(is_changed);
+    }
 
 
     /* TODO: fill in the rest of this class. */
@@ -70,11 +78,25 @@ public class Repository {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            try {
+                currentBranch.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            writeObject(currentBranch,MASTER_DIR);
+
             Commit commit = new Commit();
             commit.initCommit();
+
         } else {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
+    }
+
+    public static boolean isInitialized() {
+        if (!GITLET_DIR.exists())
+            return false;
+        return true;
     }
 
     public static void initStageArea() {
@@ -231,7 +253,7 @@ public class Repository {
         }
         writeObject(f2, commit2);
         writeContents(Repository.HEAD_FILE, commitHashID);//把头指针指向commit
-        writeContents(currentBranch, commitHashID);//当前分支指向head//TODO
+        writeContents(readObject(currentBranch,File.class), commitHashID);//当前分支指向head//TODO
         //System.out.println(blobIDList);
     }
 
@@ -344,8 +366,8 @@ public class Repository {
         Commit commit = readObject(f, Commit.class);
         while (!commit.ID.equals(" ")) {
             System.out.println("===");
-            System.out.println(commit.ID.substring(0, 8));
-            System.out.println(commit.timestamp);
+            System.out.println("commit "+commit.ID.substring(0, 8));
+            System.out.println("Date: "+commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
             try {
@@ -498,12 +520,12 @@ public class Repository {
     }
     public static void checkout3(String branchName) {
         File branch = join(HEADS_DIR, branchName); //提取分支指针指向的commit
-        String currentCommitID = readContentsAsString(currentBranch);
+        //String currentCommitID = readContentsAsString(currentBranch);
 
         if (!branch.exists()) {
             System.out.println("No such branch exists.");
         }
-        else if(currentBranch.equals(branch)) {
+        else if(readObject(currentBranch,File.class).equals(branch)) {
             System.out.println("No need to checkout the current branch.");
             return;
         } else {
@@ -530,7 +552,8 @@ public class Repository {
                 }
                     writeContents(workfile, blob.fileContent);
                 }
-                 currentBranch = branch;
+                 //currentBranch = branch;
+                 writeObject(currentBranch, branch);
             }
         }
 
@@ -555,7 +578,7 @@ public class Repository {
         if (!branch.exists()) {
             System.out.println("A branch with that name does not exist.");
             return;
-        }else if(branch.equals(currentBranch)){
+        }else if(branch.equals(readObject(currentBranch,File.class))){
             System.out.println("Cannot remove the current branch.");
             return;
         }else{
