@@ -695,7 +695,9 @@ public class Repository {
         String branchCommitID = readContentsAsString(readObject(currentBranch, File.class));
         Commit commit = readObject(join(COMMIT_DIR, branchCommitID), Commit.class);
         List<String> trackedFileBlobIDs = commit.blobID;
-
+        if (trackedFileBlobIDs == null){
+            return false;
+        }
         for (String trackedFileBlobID : trackedFileBlobIDs){
             Blob blob = readObject(join(BLOB_DIR, trackedFileBlobID), Blob.class);
             trackedFiles.add(blob.fileName);
