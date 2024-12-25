@@ -688,8 +688,11 @@ public class Repository {
         File testfile = join(CWD, "test");
 
         File[] workingFiles = testfile.listFiles();
-        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
 
+        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
+        if (blobIDs==null){
+            return false;
+        }
         for (File file : workingFiles) {
             if (file.isFile() ) {
                 String content = readContentsAsString(file);
