@@ -616,7 +616,11 @@ public class Repository {
             System.out.println("No need to checkout the current branch.");
             return;
         } else {
-
+            //System.out.println(hasUntrackedFiles());
+            if (hasUntrackedFiles()){
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                return;
+            }
             String headCommitID = readContentsAsString(branch); //提取分支指针指向的commit
             Commit commit = readObject(join(COMMIT_DIR, headCommitID), Commit.class);//从分支指向的commit提取commit对象
              //头指针指向分支指向的commit
@@ -629,13 +633,10 @@ public class Repository {
                 blobfileNames.add(blob.fileName);
             }
 
-            //File testfile = join(CWD, "test");
-            File[] files = CWD.listFiles();
+            File testfile = join(CWD, "test");
+            File[] files = testfile.listFiles();
             //findFileRecursivelyParent(CWD, "test");
-            if (hasUntrackedFiles()){
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                return;
-            }
+
 
             if (files != null) {
                 for (File file : files) {
@@ -684,35 +685,22 @@ public class Repository {
         }
 
     public static boolean hasUntrackedFiles() {
-        // 获取工作目录中的所有文件
-        File[] workingFiles = CWD.listFiles();
+        File testfile = join(CWD, "test");
 
-        // 获取当前分支的提交 ID
-        String branchCommitID = readContentsAsString(readObject(currentBranch, File.class));
+        File[] workingFiles = testfile.listFiles();
+        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
 
-        // 获取当前分支对应提交的 Blob 文件 IDs
-        Commit commit = readObject(join(COMMIT_DIR, branchCommitID), Commit.class);
-        List<String> trackedFileBlobIDs = commit.blobID;
-
-        // 如果当前分支的提交没有任何跟踪文件，直接返回 false
-        if (trackedFileBlobIDs == null || trackedFileBlobIDs.isEmpty()) {
-            return false;
-        }
-
-        // 使用 Set 存储已跟踪的文件名，便于快速查找
-        Set<String> trackedFiles = new HashSet<>();
-        for (String blobID : trackedFileBlobIDs) {
-            Blob blob = readObject(join(BLOB_DIR, blobID), Blob.class);
-            trackedFiles.add(blob.fileName);
-        }
-
-        // 遍历工作目录中的所有文件，检查是否存在未跟踪文件
         for (File file : workingFiles) {
-            if (file.isFile() && !trackedFiles.contains(file.getName())) {
-                return true;  // 发现未跟踪文件
+            if (file.isFile() ) {
+                String content = readContentsAsString(file);
+                String fileName = file.getName();
+                Blob blob = new Blob();
+                String blobID = blob.generatelID(content, fileName);
+                if (!blobIDs.contains(blobID)) {
+                    return true;  // 发现未跟踪文件
+                }
             }
         }
-
         return false;  // 没有未跟踪文件
     }
 
