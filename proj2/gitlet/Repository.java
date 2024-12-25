@@ -136,6 +136,7 @@ public class Repository {
     public static void add(String filename) {
 
         String filePath = findFileRecursively(CWD, filename);
+        Commit commit = getCommitFromHead();
         if (filePath == null) {
             System.out.println("File does not exist.");
             return;
@@ -146,6 +147,9 @@ public class Repository {
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents);//得到hash id
+            if (commit.blobID.contains(hashBlobID)){
+                return;
+            }
             File removeFile = join(REMOVESATGE_DIR, filename);
             if(removeFile.exists()) {
                 //System.out.println(hashBlobID+" "+readContentsAsString(removeFile));
@@ -169,7 +173,7 @@ public class Repository {
 
             File f5 = join(ADDSTAGE_DIR, filename);
             //如果版本相同，不添加，版本不同，添加
-            //
+
             if (!f5.exists()) {                      //哈希值不同
                 try {
                     f5.createNewFile();
@@ -198,10 +202,12 @@ public class Repository {
         //File f = new File(addstagePath);
         List<String> stagefileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
         //System.out.println(is_changed);
-//        if (stagefileNames.isEmpty()&&!is_changed) {
-//            System.out.println("No changes added to the commit.");
-//            return;
-//        }
+        if (stagefileNames.isEmpty()) {
+            System.out.println("No changes added to the commit.");
+            return;
+        }
+        deleteAllFiles(REMOVESATGE_DIR); //清空removestage
+        
                                          //addstage中文件 文件名p.txt 内容 hash blobid
 
        // readContentsAsString(join(REMOVESATGE_DIR,removeFileName)).equals(headCommitblobID)
@@ -618,6 +624,17 @@ public class Repository {
             }
         }
     }
+    public static void deleteAllFiles(File dir) {
+        // 获取工作目录中的所有文件和子目录
+        File[] files = dir.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                    file.delete();
+                }
+            }
+        }
+
     public static void merge(String branchName){
     }
 }
