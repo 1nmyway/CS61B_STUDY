@@ -147,13 +147,13 @@ public class Repository {
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents);//得到hash id
-            if (commit.blobID!=null && commit.blobID.contains(hashBlobID)){
+            if (commit.blobID!=null && commit.blobID.contains(hashBlobID)){ //如果两次add的文件完全一致，则不添加
                 return;
             }
             File removeFile = join(REMOVESATGE_DIR, filename);
             if(removeFile.exists()) {
                 //System.out.println(hashBlobID+" "+readContentsAsString(removeFile));
-                if (contents.equals(readContentsAsString(removeFile))) {
+                if (hashBlobID.equals(readContentsAsString(removeFile))) {
                     removeFile.delete();
                     return;
                 }
