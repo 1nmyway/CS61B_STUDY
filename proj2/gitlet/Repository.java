@@ -314,10 +314,10 @@ public class Repository {
                 writeContents(f, hashBlobID); //removestage中的文件存放hash id
                 is_changed = true;
                 return;
-            } else {
-                System.out.println("No reason to remove the file.");
-                return;
-            }
+            } 
+            }else {
+            System.out.println("No reason to remove the file.");
+            return;
         }
 
 
