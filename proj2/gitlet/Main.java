@@ -70,6 +70,8 @@ public class Main {
                     String commitId = args[1];
                     String fileName = args[3];
                     Repository.checkout2(commitId, fileName);
+                }else{
+                    System.out.println("Incorrect operands.");
                 }
 
                 break;
