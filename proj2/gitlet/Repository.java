@@ -431,8 +431,8 @@ public class Repository {
             File f = join(COMMIT_DIR, fileName);
             Commit commit = readObject(f, Commit.class);
             System.out.println("===");
-            System.out.println(commit.ID.substring(0,8));
-            System.out.println(commit.timestamp);
+            System.out.println("commit "+commit.ID.substring(0,8));
+            System.out.println("Date: "+commit.timestamp);
             System.out.println(commit.message);
             //System.out.println(commit.parents);
             //System.out.println(commit.blobID);
