@@ -13,9 +13,9 @@ public class Main {
         if (args.length == 0){
             System.out.println("Please enter a command.");
             return;
-        }else if (!Repository.GITLET_DIR.exists()){
-            System.out.println("Not in an initialized Gitlet directory.");
-            return;
+//        }else if (!Repository.GITLET_DIR.exists()){
+//            System.out.println("Not in an initialized Gitlet directory.");
+//            return;
         }
         String firstArg = args[0];
 
@@ -70,7 +70,7 @@ public class Main {
                 Repository.rm_branch(args[1]);
                 break;
             case "reset":
-                Repository.rm(args[1]);
+                Repository.reset(args[1]);
                 break;
             case "merge":
                 Repository.rm(args[1]);
