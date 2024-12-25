@@ -510,6 +510,9 @@ public class Repository {
     public static void checkout(Commit commit,String fileName) {
          int a=0;
         String filePath = findFileRecursively(CWD, fileName);
+        if (filePath == null){
+            System.out.println("File does not exist in that commit.");
+        }
             File f = new File(filePath);                       //要修改的文件，工作目录中
             //commit.pathToBlobID.get(fileName);
             List<File> files = getBlobFileListFromCommit(commit);
