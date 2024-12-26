@@ -166,7 +166,7 @@ public class Repository {
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents,fileName);//得到hash id
-            System.out.println(fileName+" "+hashBlobID);
+            //System.out.println(fileName+" "+hashBlobID);
             if (commit.blobID!=null) {
                 if (commit.blobID.contains(hashBlobID)) { //如果两次add的文件完全一致，则不添加
                     //System.out.println(commit.blobID+" "+hashBlobID+"666");
