@@ -573,7 +573,7 @@ public class Repository {
 //        }
         return blobFilesList;
     }
-    public static void checkout(Commit commit,String fileName) {
+    public static void checkout(Commit commit,String fileName) { //把工作目录中的文件修改为commit里的
          int a=0;
         String filePath = findFileRecursively(CWD, fileName);
         if (filePath == null){
@@ -917,6 +917,27 @@ public class Repository {
 //        }
 //        return false;
         }
+    public static void checkout4(Commit commit,String fileName) { //把工作目录中的文件修改为commit里的
+            File f = new File(fileName);
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+                             //要修改的文件，工作目录中
+        //commit.pathToBlobID.get(fileName);
+        List<File> files = getBlobFileListFromCommit(commit);
+        //System.out.println(files);
+        for (File file : files) {
+            //System.out.println(file.getPath());
+            Blob blob = readObject(file, Blob.class);
+            if (blob.fileName.equals(fileName)) {
+                writeContents(f, blob.fileContent);
+                //System.out.println("content:"+blob.fileContent);
+                //System.out.println("filename:"+blob.fileName);
+            }
+        }
+    }
     public static boolean modifiedOnlyInCurrent(FileStatus currentStatus,FileStatus mergeBaseStatus){
         if (currentStatus.isModified() && !mergeBaseStatus.isModified()){
             return true;
@@ -931,6 +952,13 @@ public class Repository {
     }
     public static boolean bothDeleted(FileStatus currentStatus,FileStatus targetStatus){
         if (currentStatus.isDeleted() && targetStatus.isDeleted()){
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean targetHasFileButNotInCurrent(FileStatus currentStatus,FileStatus targetStatus){
+        if (!currentStatus.exists() && targetStatus.exists()){
             return true;
         }
         return false;
@@ -1033,11 +1061,12 @@ public class Repository {
                     FileStatus targetStatus = getFileStatus(givenBranchCommit,splitPointCommit,fileName);
                     FileStatus mergeBaseStatus = getFileStatus(splitPointCommit,splitPointCommit,fileName);
 
-                    if (bothModified(currentStatus, targetStatus, mergeBaseStatus)) {
+                    if (bothModified(currentStatus, targetStatus, mergeBaseStatus)) { // 冲突
                         // 处理冲突
                         resolveConflict(fileName, currentBranchCommit, givenBranchCommit);
                     } else if (modifiedOnlyInCurrent(currentStatus, mergeBaseStatus)) {
                         // 保持当前分支的文件
+                        //不做任何事
                     } else if (modifiedOnlyInTarget(targetStatus, mergeBaseStatus)) {
                         // 更新为目标分支的文件
                         checkout(givenBranchCommit, fileName);
@@ -1047,6 +1076,8 @@ public class Repository {
                         if (file.exists()) {
                             file.delete();
                         }
+                    }else if(targetHasFileButNotInCurrent(currentStatus, targetStatus)){
+                        checkout4(givenBranchCommit, fileName);
                     }
                 }
 
