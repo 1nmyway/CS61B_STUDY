@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -49,12 +50,6 @@ public class Repository {
     public static boolean is_changed ;
 
 
-    public static void a(){
-        is_changed=true;
-    }
-    public static void b () {
-        System.out.println(is_changed);
-    }
 
 
     /* TODO: fill in the rest of this class. */
@@ -110,9 +105,9 @@ public class Repository {
         }
     }
 
-    private static String findFileRecursively(File directory, String fileName) {
+    private static String findFileRecursively(final File directory,final String fileName) {
         // 列出目录中的所有文件和子目录
-        File[] files = directory.listFiles();
+         final File[] files = directory.listFiles();
 
         if (files != null) {
             for (File file : files) {
@@ -162,7 +157,6 @@ public class Repository {
         Commit commit = getCommitFromHead();
         if (filePath == null) {
             System.out.println("File does not exist.");
-            return;
         } else {
             File file = new File(filePath);
             String contents = readContentsAsString(file);
@@ -397,12 +391,9 @@ public class Repository {
                     throw new RuntimeException(e);
                 }
                 writeContents(f, hashBlobID); //removestage中的文件存放hash id
-                is_changed = true;
-                return;
             }
             }else {
             System.out.println("No reason to remove the file.");
-            return;
         }
 
 
@@ -416,7 +407,7 @@ public class Repository {
         //String path =
         File file2 = join(COMMIT_DIR, headHashID);
         File blobFile = join(BLOB_DIR, filename);
-        String blobFilePath = blobFile.getPath();
+        //String blobFilePath = blobFile.getPath();
         File stageFile = join(ADDSTAGE_DIR, filename);
 
         //System.out.println(stageFile.exists());
@@ -484,18 +475,7 @@ public class Repository {
     }
 
     //print the commit history of all commits
-    public void global_log2() {
-        //get the global log of all commits
-        File commit = COMMIT_DIR;
-        for (File file : commit.listFiles()) {
-            Commit current = readObject(file, Commit.class);
-            System.out.println("===");
-            System.out.println("commit " + current.ID);
-            System.out.println("Date: " + current.timestamp);
-            System.out.println(current.message);
-            System.out.println();
-        }
-    }
+
 
     public static void globalLog() {
         //String commitHashID = readContentsAsString(Repository.HEAD_FILE);
@@ -607,7 +587,6 @@ public class Repository {
             }
             if (a==0){
                 System.out.println("File does not exist in that commit.");
-                return;
             }
 
         }
@@ -654,7 +633,7 @@ public class Repository {
              //头指针指向分支指向的commit
 
             List<File> blobfiles = getBlobFileListFromCommit(commit);
-            List<String> blobfileNames = new ArrayList<String>();
+            List<String> blobfileNames = new ArrayList<>();
             //System.out.println("sad "+blobfiles);
             for (File file5 : blobfiles){
                 Blob blob = readObject(file5, Blob.class);
@@ -755,10 +734,8 @@ public class Repository {
         File branch = join(HEADS_DIR, branchName);
         if (!branch.exists()) {
             System.out.println("A branch with that name does not exist.");
-            return;
         }else if(branch.equals(readObject(currentBranch,File.class))){
             System.out.println("Cannot remove the current branch.");
-            return;
         }else{
         branch.delete();
         }
@@ -787,6 +764,10 @@ public class Repository {
         for (File file5 : blobfiles){
             Blob blob = readObject(file5, Blob.class);
             blobfileNames.add(blob.fileName);
+        }
+        List<String> stagefiles = plainFilenamesIn(ADDSTAGE_DIR);
+        for (String fileName : stagefiles){
+            join(ADDSTAGE_DIR, fileName).delete();
         }
 
         //File testfile = join(CWD, "test");

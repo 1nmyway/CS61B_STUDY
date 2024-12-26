@@ -87,12 +87,7 @@ public class Main {
             case "merge":
                 Repository.rm(args[1]);
                 break;
-            case "a":
-                Repository.a();
-                break;
-            case "b":
-                Repository.b();
-                break;
+
             default:
                 System.out.println("No command with that name exists.");
         }
