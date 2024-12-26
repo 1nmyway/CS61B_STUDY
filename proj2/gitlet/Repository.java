@@ -48,9 +48,7 @@ public class Repository {
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
 
     public static File currentBranch = join(REFS_DIR, "currentBranch");
-    public static boolean is_changed ;
-
-
+    public static boolean is_changed;
 
 
     /* TODO: fill in the rest of this class. */
@@ -79,7 +77,7 @@ public class Repository {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            writeObject(currentBranch,MASTER_DIR);
+            writeObject(currentBranch, MASTER_DIR);
 
             Commit commit = new Commit();
             commit.initCommit();
@@ -106,9 +104,9 @@ public class Repository {
         }
     }
 
-    private static String findFileRecursively(final File directory,final String fileName) {
+    private static String findFileRecursively(final File directory, final String fileName) {
         // 列出目录中的所有文件和子目录
-         final File[] files = directory.listFiles();
+        final File[] files = directory.listFiles();
 
         if (files != null) {
             for (File file : files) {
@@ -165,9 +163,9 @@ public class Repository {
             Blob blob0 = new Blob();
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
-            String hashBlobID = blob0.generatelID(contents,fileName);//得到hash id
+            String hashBlobID = blob0.generatelID(contents, fileName);//得到hash id
             //System.out.println(fileName+" "+hashBlobID);
-            if (commit.blobID!=null) {
+            if (commit.blobID != null) {
                 if (commit.blobID.contains(hashBlobID)) { //如果两次add的文件完全一致，则不添加
                     //System.out.println(commit.blobID+" "+hashBlobID+"666");
                     return;
@@ -243,10 +241,10 @@ public class Repository {
 
         deleteAllFiles(REMOVESATGE_DIR); //清空removestage
 
-                                         //addstage中文件 文件名p.txt 内容 hash blobid
+        //addstage中文件 文件名p.txt 内容 hash blobid
 
-       // readContentsAsString(join(REMOVESATGE_DIR,removeFileName)).equals(headCommitblobID)
-        Commit headcommit=getCommitFromHead();//先把headcommit里的所有blob id加进来，除了addstage里有的
+        // readContentsAsString(join(REMOVESATGE_DIR,removeFileName)).equals(headCommitblobID)
+        Commit headcommit = getCommitFromHead();//先把headcommit里的所有blob id加进来，除了addstage里有的
         List<String> headCommitblobIDList = headcommit.blobID;
         List<String> removeFileNameList = Utils.plainFilenamesIn(REMOVESATGE_DIR);
 
@@ -273,7 +271,6 @@ public class Repository {
         }
 
 
-
 //        if (headCommitblobIDList!=null) {
 //            for (String headCommitblobID : headCommitblobIDList) {
 //                for (int i = 0; i < stagefileNames.size(); i++) {
@@ -292,8 +289,6 @@ public class Repository {
 
 //        assert headCommitblobIDList != null;
 //        headCommitblobIDList.stream().filter()
-
-
 
 
         if (!stagefileNames.isEmpty()) {
@@ -318,7 +313,7 @@ public class Repository {
             Blob blob = readObject(join(BLOB_DIR, blobID), Blob.class);
             fileMap.put(blob.fileName, blobID);
         }
-        Commit commit2 = new Commit(message, parents, Commit.dateToTimeStamp(date), blobIDList, commitHashID, "", commitHashID,readObject(currentBranch, File.class),fileMap);//填入所有commit信息
+        Commit commit2 = new Commit(message, parents, Commit.dateToTimeStamp(date), blobIDList, commitHashID, "", commitHashID, readObject(currentBranch, File.class), fileMap);//填入所有commit信息
         File f2 = join(COMMIT_DIR, commitHashID);//commit的文件名使用hash id
         try {
             f2.createNewFile();
@@ -355,7 +350,7 @@ public class Repository {
         File f = join(REMOVESATGE_DIR, filename);
         //remove the file from the staging area
         String filePath = findFileRecursively(CWD, filename);
-        if (filePath == null){
+        if (filePath == null) {
             try {
                 f.createNewFile();
             } catch (IOException e) {
@@ -367,13 +362,13 @@ public class Repository {
         //System.out.println(filePath);
         String contents = readContentsAsString(file);
         String workfileName = file.getName();
-       Blob blob0 = new Blob();
-       String hashBlobID = blob0.generatelID(contents,workfileName);//得到工作目录中文件的hash id
+        Blob blob0 = new Blob();
+        String hashBlobID = blob0.generatelID(contents, workfileName);//得到工作目录中文件的hash id
         Commit headCommit = getCommitFromHead();
 
-        if (join(ADDSTAGE_DIR, filename).exists()){
-        join(ADDSTAGE_DIR, filename).delete();
-        //file.delete();
+        if (join(ADDSTAGE_DIR, filename).exists()) {
+            join(ADDSTAGE_DIR, filename).delete();
+            //file.delete();
 
 //        try {
 //            f.createNewFile();
@@ -381,10 +376,10 @@ public class Repository {
 //            throw new RuntimeException(e);
 //        }
 //        writeContents(f, contents);
-        return;
+            return;
         }
         //System.out.println(headCommit.blobID+" "+hashBlobID);//删除工作目录中的文件
-        if (headCommit.blobID!=null) {
+        if (headCommit.blobID != null) {
             if (headCommit.blobID.contains(hashBlobID)) {
                 //headCommit.blobID.remove(hashBlobID);
                 file.delete();
@@ -398,7 +393,7 @@ public class Repository {
                 }
                 writeContents(f, hashBlobID); //removestage中的文件存放hash id
             }
-            }else {
+        } else {
             System.out.println("No reason to remove the file.");
         }
 
@@ -421,7 +416,7 @@ public class Repository {
 //        for (String key : commit.pathToBlobID.keySet()) {
 //            System.out.println(key + ": " + commit.pathToBlobID.get(key));
 //        }   测试，打印出pathToBlobID内的所有内容
-        if (commit.blobID.size()!=0) {  //在当前提交中跟踪
+        if (commit.blobID.size() != 0) {  //在当前提交中跟踪
             //add(filename);     //添加到暂存区
             restrictedDelete(blobFile);
 
@@ -467,8 +462,8 @@ public class Repository {
         Commit commit = readObject(f, Commit.class);
         while (!commit.ID.equals(" ")) {
             System.out.println("===");
-            System.out.println("commit "+commit.ID);
-            System.out.println("Date: "+commit.timestamp);
+            System.out.println("commit " + commit.ID);
+            System.out.println("Date: " + commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
             try {
@@ -487,14 +482,13 @@ public class Repository {
     public static void globalLog() {
         //String commitHashID = readContentsAsString(Repository.HEAD_FILE);
         //File f = join(COMMIT_DIR, commitHashID);//头指针指向的commit
-        List<String> commitFileNameList =  plainFilenamesIn(COMMIT_DIR);
-        for (String fileName : commitFileNameList)
-        {
+        List<String> commitFileNameList = plainFilenamesIn(COMMIT_DIR);
+        for (String fileName : commitFileNameList) {
             File f = join(COMMIT_DIR, fileName);
             Commit commit = readObject(f, Commit.class);
             System.out.println("===");
-            System.out.println("commit "+commit.ID);
-            System.out.println("Date: "+commit.timestamp);
+            System.out.println("commit " + commit.ID);
+            System.out.println("Date: " + commit.timestamp);
             System.out.println(commit.message);
             //System.out.println(commit.parents);
             //System.out.println(commit.blobID);
@@ -531,9 +525,9 @@ public class Repository {
         List<String> branchNames = Utils.plainFilenamesIn(HEADS_DIR);
         for (int i = 0; i < branchNames.size(); i++) {
             String fileName = branchNames.get(i);
-            if (readObject(currentBranch,File.class).getName().equals(fileName)) {
+            if (readObject(currentBranch, File.class).getName().equals(fileName)) {
                 System.out.println("*" + fileName);
-            }else {
+            } else {
                 System.out.println(fileName);
             }
         }
@@ -557,14 +551,15 @@ public class Repository {
         System.out.println("=== Untracked Files ===");
     }
 
-    public static Commit getCommitFromHead(){
+    public static Commit getCommitFromHead() {
         String head = readContentsAsString(HEAD_FILE);
         Commit commit = readObject(join(COMMIT_DIR, head), Commit.class);
         return commit;
     }
-    public static List<File> getBlobFileListFromCommit(Commit commit){
+
+    public static List<File> getBlobFileListFromCommit(Commit commit) {
         List<File> blobFilesList = new ArrayList<>();
-        if (commit.blobID!=null) {
+        if (commit.blobID != null) {
             for (String blobID : commit.blobID) {
                 blobFilesList.add(join(BLOB_DIR, blobID));
                 //System.out.println(blobID);
@@ -575,47 +570,49 @@ public class Repository {
 //        }
         return blobFilesList;
     }
-    public static void checkout(Commit commit,String fileName) { //把工作目录中的文件修改为commit里的
-         int a=0;
+
+    public static void checkout(Commit commit, String fileName) { //把工作目录中的文件修改为commit里的
+        int a = 0;
         String filePath = findFileRecursively(CWD, fileName);
-        if (filePath == null){
+        if (filePath == null) {
             System.out.println("File does not exist in that commit.");
             return;
         }
-            File f = new File(filePath);                       //要修改的文件，工作目录中
-            //commit.pathToBlobID.get(fileName);
-            List<File> files = getBlobFileListFromCommit(commit);
-            //System.out.println(files);
-            for (File file : files) {
-                //System.out.println(file.getPath());
-                Blob blob = readObject(file, Blob.class);
-                if (blob.fileName.equals(fileName)) {
-                    writeContents(f, blob.fileContent);
-                    a=1;
-                    //System.out.println("content:"+blob.fileContent);
-                    //System.out.println("filename:"+blob.fileName);
-                }
+        File f = new File(filePath);                       //要修改的文件，工作目录中
+        //commit.pathToBlobID.get(fileName);
+        List<File> files = getBlobFileListFromCommit(commit);
+        //System.out.println(files);
+        for (File file : files) {
+            //System.out.println(file.getPath());
+            Blob blob = readObject(file, Blob.class);
+            if (blob.fileName.equals(fileName)) {
+                writeContents(f, blob.fileContent);
+                a = 1;
+                //System.out.println("content:"+blob.fileContent);
+                //System.out.println("filename:"+blob.fileName);
             }
-            if (a==0){
-                System.out.println("File does not exist in that commit.");
-            }
-
         }
+        if (a == 0) {
+            System.out.println("File does not exist in that commit.");
+        }
+
+    }
 
 
     public static void checkout1(String fileName) { //只换指定的文件
-    //String head = readContentsAsString(HEAD_FILE); //提取头指针指向的commit
+        //String head = readContentsAsString(HEAD_FILE); //提取头指针指向的commit
         Commit headCommit = getCommitFromHead();
         if (headCommit.blobID.size() != 0) {
             checkout(headCommit, fileName);
-        }else{
-        System.out.println("File does not exist in that commit.");
+        } else {
+            System.out.println("File does not exist in that commit.");
+        }
     }
-    }
-    public static void checkout2(String ID,String fileName) {
+
+    public static void checkout2(String ID, String fileName) {
         List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
-        for(String commitfilesName : commitfilesNames){
-            if (commitfilesName.substring(0,8).equals(ID)||commitfilesName.equals(ID)){
+        for (String commitfilesName : commitfilesNames) {
+            if (commitfilesName.substring(0, 8).equals(ID) || commitfilesName.equals(ID)) {
                 Commit commit = readObject(join(COMMIT_DIR, commitfilesName), Commit.class);
                 checkout(commit, fileName);
                 return;
@@ -623,30 +620,30 @@ public class Repository {
         }
         System.out.println("No commit with that id exists.");
     }
+
     public static void checkout3(String branchName) {
         File branch = join(HEADS_DIR, branchName); //提取分支指针指向的commit
         //String currentCommitID = readContentsAsString(currentBranch);
 
         if (!branch.exists()) {
             System.out.println("No such branch exists.");
-        }
-        else if(readObject(currentBranch,File.class).equals(branch)) {
+        } else if (readObject(currentBranch, File.class).equals(branch)) {
             System.out.println("No need to checkout the current branch.");
 
         } else {
             //System.out.println(hasUntrackedFiles());
-            if (hasUntrackedFiles()){
+            if (hasUntrackedFiles()) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
             String headCommitID = readContentsAsString(branch); //提取分支指针指向的commit
             Commit commit = readObject(join(COMMIT_DIR, headCommitID), Commit.class);//从分支指向的commit提取commit对象
-             //头指针指向分支指向的commit
+            //头指针指向分支指向的commit
 
             List<File> blobfiles = getBlobFileListFromCommit(commit);
             List<String> blobfileNames = new ArrayList<>();
             //System.out.println("sad "+blobfiles);
-            for (File file5 : blobfiles){
+            for (File file5 : blobfiles) {
                 Blob blob = readObject(file5, Blob.class);
                 blobfileNames.add(blob.fileName);
             }
@@ -659,7 +656,7 @@ public class Repository {
             if (files != null) {
                 for (File file : files) {
                     String f = file.getName(); //工作目录中的文件
-                    if (!blobfileNames.contains(f)){
+                    if (!blobfileNames.contains(f)) {
                         file.delete();
                     }
                 }
@@ -697,10 +694,10 @@ public class Repository {
 //                    writeContents(workfile, blob.fileContent);
 //                }
 //            }
-                 //currentBranch = branch;
+            //currentBranch = branch;
 
-            }
         }
+    }
 
     public static boolean hasUntrackedFiles() {
 
@@ -709,11 +706,11 @@ public class Repository {
 
         List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
         //System.out.println(blobIDs);
-        if (blobIDs==null){
+        if (blobIDs == null) {
             return false;
         }
         for (File file : workingFiles) {
-            if (file.isFile() ) {
+            if (file.isFile()) {
                 String content = readContentsAsString(file);
                 String fileName = file.getName();
                 Blob blob = new Blob();
@@ -729,7 +726,7 @@ public class Repository {
     }
 
 
-    public static void branch(String branchName){
+    public static void branch(String branchName) {
         File newBranch = join(HEADS_DIR, branchName);
         if (newBranch.exists()) {
             System.out.println("A branch with that name already exists.");
@@ -744,52 +741,52 @@ public class Repository {
         writeContents(newBranch, headCommitID);
     }
 
-    public static void rm_branch(String branchName){
+    public static void rm_branch(String branchName) {
         File branch = join(HEADS_DIR, branchName);
         if (!branch.exists()) {
             System.out.println("A branch with that name does not exist.");
-        }else if(branch.equals(readObject(currentBranch,File.class))){
+        } else if (branch.equals(readObject(currentBranch, File.class))) {
             System.out.println("Cannot remove the current branch.");
-        }else{
-        branch.delete();
+        } else {
+            branch.delete();
         }
     }
 
-    public static void reset(String commitID){
-        int i =0;
-    List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
-    Commit commit = null;
-    for (String commitfileName : commitfilesNames) {
-        if (commitfileName.equals(commitID)||commitfileName.substring(0,8).equals(commitID)) {
-             commit = readObject(join(COMMIT_DIR, commitfileName), Commit.class);
-             if (commit.branch.equals(readObject(currentBranch, File.class))) {
-                 writeContents(HEAD_FILE, commitfileName);
-                 writeContents(readObject(currentBranch, File.class), commitfileName);
-             }else{
-                 writeContents(HEAD_FILE, commitfileName);
-             }
-            i=1;
+    public static void reset(String commitID) {
+        int i = 0;
+        List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
+        Commit commit = null;
+        for (String commitfileName : commitfilesNames) {
+            if (commitfileName.equals(commitID) || commitfileName.substring(0, 8).equals(commitID)) {
+                commit = readObject(join(COMMIT_DIR, commitfileName), Commit.class);
+                if (commit.branch.equals(readObject(currentBranch, File.class))) {
+                    writeContents(HEAD_FILE, commitfileName);
+                    writeContents(readObject(currentBranch, File.class), commitfileName);
+                } else {
+                    writeContents(HEAD_FILE, commitfileName);
+                }
+                i = 1;
+            }
         }
-    }
-        if (hasUntrackedFiles()){
+        if (hasUntrackedFiles()) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             return;
         }
-    if (i==0){
-        System.out.println("No commit with that id exists.");
-        return;
-    }
-                                                                                //提取分支指针指向的commit
+        if (i == 0) {
+            System.out.println("No commit with that id exists.");
+            return;
+        }
+        //提取分支指针指向的commit
         //从分支指向的commit提取commit对象
         //头指针指向分支指向的commi
         List<File> blobfiles = getBlobFileListFromCommit(commit);
         List<String> blobfileNames = new ArrayList<String>();
-        for (File file5 : blobfiles){
+        for (File file5 : blobfiles) {
             Blob blob = readObject(file5, Blob.class);
             blobfileNames.add(blob.fileName);
         }
         List<String> stagefiles = plainFilenamesIn(ADDSTAGE_DIR);
-        for (String fileName : stagefiles){
+        for (String fileName : stagefiles) {
             join(ADDSTAGE_DIR, fileName).delete();
         }
 
@@ -800,7 +797,7 @@ public class Repository {
         if (files != null) {
             for (File file : files) {
                 String f = file.getName(); //工作目录中的文件
-                if (!blobfileNames.contains(f)){
+                if (!blobfileNames.contains(f)) {
                     file.delete();
                 }
             }
@@ -815,8 +812,6 @@ public class Repository {
         //writeContents(HEAD_FILE, headCommitID);
 
 
-
-
 //    Commit commit = readObject(join(COMMIT_DIR, commitID), Commit.class);
 //        List<String> blobIDList = commit.blobID;
 //        for (String blobID : blobIDList){
@@ -826,6 +821,7 @@ public class Repository {
 //        }
 //        writeContents(currentBranch, commitID);
     }
+
     public static void deleteAllFilesExceptTracked(String blobID) {
         // 获取工作目录中的所有文件和子目录
         File[] files = CWD.listFiles();
@@ -834,8 +830,8 @@ public class Repository {
             for (File file : files) {
                 String c = readContentsAsString(file);
                 String f = file.getName();
-                Blob blob =new Blob();
-                String fileblobID = blob.generatelID(c,f);
+                Blob blob = new Blob();
+                String fileblobID = blob.generatelID(c, f);
                 if (!fileblobID.equals(blobID)) {            //blob id相同的文件不删除
                     //System.out.println("Deleting file: " + file.getName());
                     file.delete();
@@ -844,7 +840,7 @@ public class Repository {
         }
     }
 
-//    public static void deleteAllFilesExceptNameEqual(String fileName) {
+    //    public static void deleteAllFilesExceptNameEqual(String fileName) {
 //        // 获取工作目录中的所有文件和子目录
 //        File[] files = CWD.listFiles();
 //
@@ -864,54 +860,53 @@ public class Repository {
 
         if (files != null) {
             for (File file : files) {
-                    file.delete();
-                }
+                file.delete();
             }
         }
+    }
 
 
+    // 获取文件在某个提交中的状态
+    public static FileStatus getFileStatus(Commit commit, Commit mergeBaseCommit, String fileName) {
+        // 获取当前提交中的文件映射（文件名 -> Blob ID）
+        Map<String, String> fileMap = commit.getFileMap();
 
-        // 获取文件在某个提交中的状态
-        public static FileStatus getFileStatus(Commit commit, Commit mergeBaseCommit, String fileName) {
-            // 获取当前提交中的文件映射（文件名 -> Blob ID）
-            Map<String, String> fileMap = commit.getFileMap();
-
-            // 如果文件不存在于当前提交中，返回不存在的状态
-            if (!fileMap.containsKey(fileName)) {
-                return new FileStatus(false, false, true, null); // 文件不存在，因此返回删除状态
-            }
-
-            // 获取文件的 Blob ID
-            String currentBlobId = fileMap.get(fileName);
-
-            // 获取分割点（merge base）提交的文件映射
-            Map<String, String> mergeBaseFileMap = mergeBaseCommit.getFileMap();
-
-            // 如果分割点中没有该文件，那么说明它是新增的
-            if (!mergeBaseFileMap.containsKey(fileName)) {
-                return new FileStatus(true, false, false, currentBlobId); // 文件是新增的
-            }
-
-            // 获取分割点中该文件的 Blob ID
-            String mergeBaseBlobId = mergeBaseFileMap.get(fileName);
-
-            // 如果当前提交中的 Blob ID 与分割点中的 Blob ID 不同，说明该文件在当前分支中被修改了
-            if (!mergeBaseBlobId.equals(currentBlobId)) {
-                return new FileStatus(true, true, false, currentBlobId); // 文件被修改了
-            }
-
-            // 如果当前提交中的 Blob ID 和分割点中的 Blob ID 相同，说明该文件在当前分支中没有修改
-            return new FileStatus(true, false, false, currentBlobId); // 文件未修改
+        // 如果文件不存在于当前提交中，返回不存在的状态
+        if (!fileMap.containsKey(fileName)) {
+            return new FileStatus(false, false, true, null); // 文件不存在，因此返回删除状态
         }
 
-    public static boolean bothModified(FileStatus currentStatus,FileStatus targetStatus,FileStatus mergeBaseStatus){
-                // 空值检查
-                if (currentStatus == null || targetStatus == null) {
-                    return false;
-                }
-                // 简化逻辑
-                return (currentStatus.isModified() && (targetStatus.isModified() || targetStatus.isDeleted())) ||
-                        (currentStatus.isDeleted() && targetStatus.isModified());
+        // 获取文件的 Blob ID
+        String currentBlobId = fileMap.get(fileName);
+
+        // 获取分割点（merge base）提交的文件映射
+        Map<String, String> mergeBaseFileMap = mergeBaseCommit.getFileMap();
+
+        // 如果分割点中没有该文件，那么说明它是新增的
+        if (!mergeBaseFileMap.containsKey(fileName)) {
+            return new FileStatus(true, false, false, currentBlobId); // 文件是新增的
+        }
+
+        // 获取分割点中该文件的 Blob ID
+        String mergeBaseBlobId = mergeBaseFileMap.get(fileName);
+
+        // 如果当前提交中的 Blob ID 与分割点中的 Blob ID 不同，说明该文件在当前分支中被修改了
+        if (!mergeBaseBlobId.equals(currentBlobId)) {
+            return new FileStatus(true, true, false, currentBlobId); // 文件被修改了
+        }
+
+        // 如果当前提交中的 Blob ID 和分割点中的 Blob ID 相同，说明该文件在当前分支中没有修改
+        return new FileStatus(true, false, false, currentBlobId); // 文件未修改
+    }
+
+    public static boolean bothModified(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        // 空值检查
+        if (currentStatus == null || targetStatus == null) {
+            return false;
+        }
+        // 简化逻辑
+        return (currentStatus.isModified() && (targetStatus.isModified() || targetStatus.isDeleted())) ||
+                (currentStatus.isDeleted() && targetStatus.isModified());
 
 //        if (currentStatus.isModified() && targetStatus.isModified() ){
 //            return true;
@@ -921,17 +916,18 @@ public class Repository {
 //            return true;
 //        }
 //        return false;
-        }
-    public static void checkout41(Commit commit,String fileName) { //把工作目录中的文件修改为commit里的
+    }
+
+    public static void checkout41(Commit commit, String fileName) { //把工作目录中的文件修改为commit里的
 
 
         File f = new File(fileName);
-            try {
-                f.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-                             //要修改的文件，工作目录中
+        try {
+            f.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        //要修改的文件，工作目录中
         //commit.pathToBlobID.get(fileName);
         List<File> files = getBlobFileListFromCommit(commit);
         //System.out.println(files);
@@ -979,20 +975,23 @@ public class Repository {
             System.out.println("File " + fileName + " not found in the commit.");
         }
     }
-    public static boolean modifiedOnlyInCurrent(FileStatus currentStatus,FileStatus mergeBaseStatus){
-        if (currentStatus.isModified() && !mergeBaseStatus.isModified()){
+
+    public static boolean modifiedOnlyInCurrent(FileStatus currentStatus, FileStatus mergeBaseStatus) {
+        if (currentStatus.isModified() && !mergeBaseStatus.isModified()) {
             return true;
         }
         return false;
     }
-    public static boolean modifiedOnlyInTarget(FileStatus targetStatus,FileStatus mergeBaseStatus){
-        if (targetStatus.isModified() && !mergeBaseStatus.isModified()){
+
+    public static boolean modifiedOnlyInTarget(FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (targetStatus.isModified() && !mergeBaseStatus.isModified()) {
             return true;
         }
         return false;
     }
-    public static boolean bothDeleted(FileStatus currentStatus,FileStatus targetStatus){
-        if (currentStatus.isDeleted() && targetStatus.isDeleted()){
+
+    public static boolean bothDeleted(FileStatus currentStatus, FileStatus targetStatus) {
+        if (currentStatus.isDeleted() && targetStatus.isDeleted()) {
             return true;
         }
         return false;
@@ -1045,26 +1044,28 @@ public class Repository {
         File givenBranchFile = join(HEADS_DIR, branchName);
         File currentBranchFile = readObject(currentBranch, File.class);
         List<String> stagedFiles = Utils.plainFilenamesIn(ADDSTAGE_DIR);
-        if (!stagedFiles.isEmpty()){
+        if (!stagedFiles.isEmpty()) {
             System.out.println("You have uncommitted changes.");
             return;
-        } else if (!givenBranchFile.exists()){
+        } else if (!givenBranchFile.exists()) {
             System.out.println("A branch with that name does not exist.");
             return;
-        }else if(givenBranchFile.equals(currentBranchFile)){
+        } else if (givenBranchFile.equals(currentBranchFile)) {
             System.out.println("Cannot merge a branch with itself.");
             return;
-        }else if(hasUntrackedFiles()){
+        } else if (hasUntrackedFiles()) {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             return;
         }
+
+
         //System.out.println("dada");
         String currentBranchCommitID = readContentsAsString(currentBranchFile);
         Commit currentBranchCommit = readObject(join(COMMIT_DIR, currentBranchCommitID), Commit.class);
 
         List<String> currentBranchCommitBlobIDList = currentBranchCommit.blobID;
         Set<String> currentFiles = new HashSet<>();
-        for (String blobID : currentBranchCommitBlobIDList){
+        for (String blobID : currentBranchCommitBlobIDList) {
             currentFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
         }
         //System.out.println("currentFiles:"+currentFiles);
@@ -1072,19 +1073,18 @@ public class Repository {
         Set<String> allFilesInMerge = new HashSet<>();
 
 
-
         String givenBranchCommitID = readContentsAsString(givenBranchFile);
         Commit givenBranchCommit = readObject(join(COMMIT_DIR, givenBranchCommitID), Commit.class);
         List<String> givenBranchCommitBlobIDList = givenBranchCommit.blobID;
         Set<String> targetFiles = new HashSet<>();
-        for (String blobID : givenBranchCommitBlobIDList){
+        for (String blobID : givenBranchCommitBlobIDList) {
             targetFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
         }
         //System.out.println("targetFiles:"+targetFiles);
         Commit splitPointCommit = findSplitPoint(currentBranchCommit, givenBranchCommit);
         List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
         Set<String> splitFiles = new HashSet<>();
-        for (String blobID : splitPointCommitBlobIDList){
+        for (String blobID : splitPointCommitBlobIDList) {
             splitFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
         }
         //System.out.println("splitFiles:"+splitFiles);
@@ -1099,89 +1099,116 @@ public class Repository {
                 System.out.println("Given branch is an ancestor of the current branch.");
             } else if (splitPointCommit.equals(currentBranchCommit)) {
                 System.out.println("Current branch fast-forwarded.");
-            }else {
+            } else {
                 for (String fileName : allFilesInMerge) {
-                    FileStatus currentStatus = getFileStatus(currentBranchCommit,splitPointCommit,fileName);
-                    FileStatus targetStatus = getFileStatus(givenBranchCommit,splitPointCommit,fileName);
-                    FileStatus mergeBaseStatus = getFileStatus(splitPointCommit,splitPointCommit,fileName);
+                    FileStatus currentStatus = getFileStatus(currentBranchCommit, splitPointCommit, fileName);
+                    FileStatus targetStatus = getFileStatus(givenBranchCommit, splitPointCommit, fileName);
+                    FileStatus mergeBaseStatus = getFileStatus(splitPointCommit, splitPointCommit, fileName);
 
                     //System.out.println("fileName: " + fileName);
 
-
-                    if (bothModified(currentStatus, targetStatus, mergeBaseStatus)) { // 冲突
-                        //System.out.println("1");
-                        // 处理冲突
-                        resolveConflict(fileName, currentBranchCommit, givenBranchCommit);//1
-                    } else if (modifiedOnlyInCurrent(currentStatus, mergeBaseStatus)) {  //2 在master已修改但未在otehr修改的任何文件都应保持原样。
-                        //System.out.println("2");                                                    //4 任何不存在于分割点且仅存在于当前分支中的文件都应保持原样
-                        // 保持当前分支的文件
-                        //不做任何事
-                    } //else if (bothDeleted(currentStatus, targetStatus)) {  //3 都删除不变
-                    // 文件删除
-                        //
-                    else if (Five(currentStatus, targetStatus,mergeBaseStatus)){    //5 检出暂存
-                        //System.out.println("3");
+                    if (One(currentStatus, targetStatus, mergeBaseStatus)) {
                         checkout4(givenBranchCommit, fileName);
                         add(fileName);
+                    } else if (Two(currentStatus, targetStatus, mergeBaseStatus)) {
 
-                    }else if(Six(currentStatus, targetStatus,mergeBaseStatus)){    //6删除
-                        //System.out.println("4");
+                    } else if (Three1(currentStatus, targetStatus, mergeBaseStatus)) {
+                        if (currentStatus.getBlobId().equals(targetStatus.getBlobId())){
+
+                        } else if (!currentStatus.getBlobId().equals(targetStatus.getBlobId())) {
+                            resolveConflict(fileName, currentBranchCommit, givenBranchCommit);
+                        }
+                    }  else if (Four(currentStatus, targetStatus, mergeBaseStatus)) {
+
+                    } else if (Five(currentStatus, targetStatus, mergeBaseStatus)) {
+                        checkout4(givenBranchCommit, fileName);
+                    } else if (Six(currentStatus, targetStatus, mergeBaseStatus)) {
                         File file = new File(fileName);
                         file.delete();
-                    }else if(Seven(currentStatus, targetStatus,mergeBaseStatus)){  //7  保持不存在
-                        //System.out.println("5");
+                    } else if (Seven(currentStatus, targetStatus, mergeBaseStatus)) {
+                        File file = new File(fileName);
+                        file.delete();
                     }
+
                 }
-
-
-//                if (splitPointCommit!=null){
-//                    List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
-//                    List<String> crchangedBlob = new ArrayList<>();
-//                    List<String> crnotChangedBlob = new ArrayList<>();
-//                    List<String> gvchangedBlob = new ArrayList<>();
-//                    List<String> gvnotChangedBlob = new ArrayList<>();
-//                    for (String blobID : currentBranchCommitBlobIDList) {
-//                        if (splitPointCommitBlobIDList.contains(blobID)) {
-//                            crchangedBlob.add(blobID);
-//                        }else{
-//                            crnotChangedBlob.add(blobID);
-//                        }
-//                    }
-//                    for (String blobID : givenBranchCommitBlobIDList){
-//                        if (splitPointCommitBlobIDList.contains(blobID)) {
-//                            gvchangedBlob.add(blobID);
-//                        }else{
-//                            gvnotChangedBlob.add(blobID);
-//                        }
-//                    }
-////                    for (String blobID : crnotChangedBlob){        //当前分支和给定分支commit中未改变的blob不变
-////                        if (gvnotChangedBlob.contains(blobID)){
-////                            return;
-////                        }
-////                    }
-//                    for (String blobID : gvchangedBlob){          //在给定分支commit中改变的blob，且在当前分支commit中未改变的blob，则替换
-//                        if (!crnotChangedBlob.contains(blobID)){
-//                            checkout(givenBranchCommit,readObject(join(BLOB_DIR,blobID), Blob.class).fileName);
-//                        }
-//                    }
-//                }
             }
         }
     }
 
-//    private static boolean Four(FileStatus currentStatus,FileStatus targetStatus, FileStatus mergeBaseStatus) {
-//    }
 
-    private static boolean Seven(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
-        if (!currentStatus.exists() && !targetStatus.isModified() && mergeBaseStatus.exists()) {
+        public static Commit findSplitPoint (Commit currentBranchCommit, Commit givenBranchCommit){
+            // 参数校验
+            if (currentBranchCommit == null || givenBranchCommit == null) {
+                return null;
+            }
+
+            Set<String> visited = new HashSet<>();  // 用来记录访问过的提交
+
+            // 使用队列进行广度优先搜索，处理多父提交的情况
+            Queue<Commit> queue = new LinkedList<>();
+            queue.offer(currentBranchCommit);
+
+            while (!queue.isEmpty()) {
+                Commit commit = queue.poll();
+                if (commit != null) {
+                    visited.add(commit.ID);
+                    for (Commit parent : commit.parents) {
+                        queue.offer(parent);
+                    }
+                }
+            }
+
+            // 回溯 givenBranchCommit 的历史，直到找到第一个共同的提交
+            while (givenBranchCommit != null) {
+                if (visited.contains(givenBranchCommit.ID)) {  // 如果 givenBranchCommit 的提交在 visited 中，说明找到了分割点
+                    return givenBranchCommit;  // 返回共同的提交
+                }
+                for (Commit parent : givenBranchCommit.parents) {
+                    givenBranchCommit = parent;
+                    break;  // 只取第一个父提交，保持原逻辑不变
+                }
+            }
+
+            // 添加日志记录
+            System.out.println("No common ancestor found between the two branches.");
+            return null;
+        }
+
+
+    private static boolean One(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (!currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isModified()) {
             return true;
         } else {
             return false;
         }
     }
 
-    private static boolean Six(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
-        if (!currentStatus.isModified() && !targetStatus.exists() && mergeBaseStatus.exists()) {
+    private static boolean Two(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (currentStatus.isModified() && !mergeBaseStatus.isModified() && !targetStatus.isModified()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean Three1(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isModified()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean Three2(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isModified()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean Four(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (currentStatus.exists() && !mergeBaseStatus.exists() && !targetStatus.exists()) {
             return true;
         } else {
             return false;
@@ -1189,72 +1216,28 @@ public class Repository {
     }
 
     private static boolean Five(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
-        if (!currentStatus.exists() && targetStatus.exists() && !mergeBaseStatus.exists()) {
+        if (!currentStatus.exists() && !mergeBaseStatus.exists() && targetStatus.exists()) {
             return true;
         } else {
             return false;
         }
     }
 
-    public static Commit findSplitPoint2(Commit currentBranchCommit,Commit givenBranchCommit){
-
-
-        Set<String> visited = new HashSet<>();  // 用来记录访问过的提交
-
-        // 回溯 commit1 的历史，直到找不到父提交
-        while (currentBranchCommit != null) {
-            visited.add(currentBranchCommit.ID);  // 记录 commit1 的所有历史提交
-            if (!currentBranchCommit.parents.isEmpty()) {
-                currentBranchCommit = currentBranchCommit.parents.get(0);  // 获取 commit1 的父提交
-            }
+    private static boolean Six(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (!currentStatus.isModified() && !mergeBaseStatus.isModified() && !targetStatus.exists()) {
+            return true;
+        } else {
+            return false;
         }
-
-        // 回溯 commit2 的历史，直到找到第一个共同的提交
-        while (givenBranchCommit != null) {
-            if (visited.contains(givenBranchCommit.ID)) {  // 如果 commit2 的提交在 visited 中，说明找到了分割点
-                return givenBranchCommit;  // 返回共同的提交
-            }
-            if (!givenBranchCommit.parents.isEmpty()) {
-                givenBranchCommit = givenBranchCommit.parents.get(0);  // 获取 commit2 的父提交
-            }
-        }
-        return null;
     }
-    public static Commit findSplitPoint(Commit currentBranchCommit, Commit givenBranchCommit) {
-        // 参数校验
-        if (currentBranchCommit == null || givenBranchCommit == null) {
-            return null;
+
+    private static boolean Seven(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (!currentStatus.exists() && !mergeBaseStatus.isModified() && !targetStatus.isModified()) {
+            return true;
+        } else {
+            return false;
         }
-
-        Set<String> visited = new HashSet<>();  // 用来记录访问过的提交
-
-        // 使用队列进行广度优先搜索，处理多父提交的情况
-        Queue<Commit> queue = new LinkedList<>();
-        queue.offer(currentBranchCommit);
-
-        while (!queue.isEmpty()) {
-            Commit commit = queue.poll();
-            if (commit != null) {
-                visited.add(commit.ID);
-                for (Commit parent : commit.parents) {
-                    queue.offer(parent);
-                }
-            }
-        }
-
-        // 回溯 givenBranchCommit 的历史，直到找到第一个共同的提交
-        while (givenBranchCommit != null) {
-            if (visited.contains(givenBranchCommit.ID)) {  // 如果 givenBranchCommit 的提交在 visited 中，说明找到了分割点
-                return givenBranchCommit;  // 返回共同的提交
-            }
-            for (Commit parent : givenBranchCommit.parents) {
-                givenBranchCommit = parent;
-                break;  // 只取第一个父提交，保持原逻辑不变
-            }
-        }
-
-        // 添加日志记录
-        System.out.println("No common ancestor found between the two branches.");
-        return null;
     }
-}
+
+
+    }
