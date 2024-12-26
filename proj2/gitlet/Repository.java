@@ -755,12 +755,14 @@ public class Repository {
              if (commit.branch.equals(readObject(currentBranch, File.class))) {
                  writeContents(HEAD_FILE, commitfileName);
                  //writeObject(readObject(currentBranch, File.class), commitfileName);
-             }else{
-                 writeContents(HEAD_FILE, commitfileName);
              }
             i=1;
         }
     }
+        if (hasUntrackedFiles()){
+            System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            return;
+        }
     if (i==0){
         System.out.println("No commit with that id exists.");
         return;
