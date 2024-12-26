@@ -754,7 +754,7 @@ public class Repository {
              commit = readObject(join(COMMIT_DIR, commitfileName), Commit.class);
              if (commit.branch.equals(readObject(currentBranch, File.class))) {
                  writeContents(HEAD_FILE, commitfileName);
-                 writeObject(readObject(currentBranch, File.class), commitfileName);
+                 writeContents(readObject(currentBranch, File.class), commitfileName);
              }else{
                  writeContents(HEAD_FILE, commitfileName);
              }
