@@ -39,6 +39,8 @@ public class Commit implements Serializable {
     public Map<String,String> pathToBlobID ;
     public List<String> blobID;
     static int num;
+
+    public File branch;
     Commit(){}
     Commit (String message, List<String> parents,String timestamp,Map<String,String> pathToBlobID ) {
         this.message = message;
@@ -71,7 +73,7 @@ public class Commit implements Serializable {
         this.fileName = fileName;
 
     }
-    Commit (String message, List<String> parents,String timestamp,List<String> blobID ,String ID,String author,String fileName) {
+    Commit (String message, List<String> parents,String timestamp,List<String> blobID ,String ID,String author,String fileName, File branch) {
         this.message = message;
         this.parents = parents;
         this.timestamp = timestamp;
@@ -79,6 +81,7 @@ public class Commit implements Serializable {
         this.ID = ID;
         this.author = author;
         this.fileName = fileName;
+        this.branch = branch;
 
     }
 

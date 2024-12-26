@@ -312,7 +312,7 @@ public class Repository {
         Commit commit = new Commit(message, parents, date, blobIDList);//创建新的commit,作用是生成hashid
         String commitHashID = commit.generatelID();
 
-        Commit commit2 = new Commit(message, parents, Commit.dateToTimeStamp(date), blobIDList, commitHashID, "", commitHashID);//填入所有commit信息
+        Commit commit2 = new Commit(message, parents, Commit.dateToTimeStamp(date), blobIDList, commitHashID, "", commitHashID,readObject(currentBranch, File.class));//填入所有commit信息
         File f2 = join(COMMIT_DIR, commitHashID);//commit的文件名使用hash id
         try {
             f2.createNewFile();
@@ -748,7 +748,12 @@ public class Repository {
     for (String commitfileName : commitfilesNames) {
         if (commitfileName.equals(commitID)||commitfileName.substring(0,8).equals(commitID)) {
              commit = readObject(join(COMMIT_DIR, commitfileName), Commit.class);
-            writeContents(HEAD_FILE, commitfileName);
+             if (commit.branch.equals(readObject(currentBranch, File.class))) {
+                 writeContents(HEAD_FILE, commitfileName);
+                 writeObject(readObject(currentBranch, File.class), commitfileName);
+             }else{
+                 writeContents(HEAD_FILE, commitfileName);
+             }
             i=1;
         }
     }
@@ -788,7 +793,7 @@ public class Repository {
 
             writeContents(join(CWD, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
         }
-        //writeObject(currentBranch, branch);
+
         //writeContents(HEAD_FILE, headCommitID);
 
 
