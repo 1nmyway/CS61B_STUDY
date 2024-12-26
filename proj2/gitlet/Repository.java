@@ -860,6 +860,44 @@ public class Repository {
         }
 
     public static void merge(String branchName){
+        File currentBranchFile = readObject(currentBranch, File.class);
+        String currentBranchCommitID =readContentsAsString(currentBranchFile);
+        Commit currentBranchCommit = readObject(join(COMMIT_DIR, currentBranchCommitID), Commit.class);
 
+        File givenBranchFile = join(HEADS_DIR, branchName);
+        String givenBranchCommitID =readContentsAsString(givenBranchFile);
+        Commit givenBranchCommit = readObject(join(COMMIT_DIR, givenBranchCommitID), Commit.class);
+
+        Commit splitPointCommit = findSplitPoint(currentBranchCommit,givenBranchCommit);
+        if (splitPointCommit!=null) {
+            if (splitPointCommit.equals(givenBranchCommit)) {
+                System.out.println("Given branch is an ancestor of the current branch.");
+            } else if (splitPointCommit.equals(currentBranchCommit)) {
+                System.out.println("Current branch fast-forwarded.");
+            }
+        }else{
+
+        }
+    }
+
+    public static Commit findSplitPoint(Commit currentBranchCommit,Commit givenBranchCommit){
+
+
+        Set<String> visited = new HashSet<>();  // 用来记录访问过的提交
+
+        // 回溯 commit1 的历史，直到找不到父提交
+        while (currentBranchCommit != null) {
+            visited.add(currentBranchCommit.ID);  // 记录 commit1 的所有历史提交
+            currentBranchCommit = readObject(join(COMMIT_DIR, currentBranchCommit.parents.get(0)), Commit.class);  // 获取 commit1 的父提交
+        }
+
+        // 回溯 commit2 的历史，直到找到第一个共同的提交
+        while (givenBranchCommit != null) {
+            if (visited.contains(givenBranchCommit.ID)) {  // 如果 commit2 的提交在 visited 中，说明找到了分割点
+                return givenBranchCommit;  // 返回共同的提交
+            }
+            givenBranchCommit = readObject(join(COMMIT_DIR, givenBranchCommit.parents.get(0)), Commit.class);  // 获取 commit2 的父提交
+        }
+        return null;
     }
 }
