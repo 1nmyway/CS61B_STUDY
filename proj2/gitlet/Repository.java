@@ -225,7 +225,7 @@ public class Repository {
         ArrayList<Commit> parents = new ArrayList<>();
         parents.add(readObject(join(COMMIT_DIR, readContentsAsString(Repository.HEAD_FILE)), Commit.class));//把头指针中指向的commit文件加为父提交
         //TreeMap<String, String> blobMap = new TreeMap<>();
-        List<String> blobIDList = new ArrayList<>();
+        ArrayList<String> blobIDList = new ArrayList<>();
         //String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
         //File f = new File(addstagePath);
         List<String> stagefileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
@@ -239,7 +239,7 @@ public class Repository {
             return;
         }
 
-        deleteAllFiles(REMOVESATGE_DIR); //清空removestage
+
 
         //addstage中文件 文件名p.txt 内容 hash blobid
 
@@ -313,8 +313,21 @@ public class Repository {
             Blob blob = readObject(join(BLOB_DIR, blobID), Blob.class);
             fileMap.put(blob.fileName, blobID);
         }
+
+        for (String file:removeFileNameList) {
+            String con = readContentsAsString(join(REMOVESATGE_DIR, file));
+            blobIDList.remove(con);
+        }
+
         Commit commit2 = new Commit(message, parents, Commit.dateToTimeStamp(date), blobIDList, commitHashID, "", commitHashID, readObject(currentBranch, File.class), fileMap);//填入所有commit信息
         File f2 = join(COMMIT_DIR, commitHashID);//commit的文件名使用hash id
+
+
+
+
+        //填入所有commit信息
+
+        deleteAllFiles(REMOVESATGE_DIR); //清空removestage
         try {
             f2.createNewFile();
         } catch (IOException e) {
@@ -381,7 +394,9 @@ public class Repository {
         //System.out.println(headCommit.blobID+" "+hashBlobID);//删除工作目录中的文件
         if (headCommit.blobID != null) {
             if (headCommit.blobID.contains(hashBlobID)) {
-                //headCommit.blobID.remove(hashBlobID);
+                //System.out.println(headCommit.blobID);
+
+                //System.out.println(headCommit.blobID);
                 file.delete();
                 if (join(ADDSTAGE_DIR, filename).exists()) {
                     join(ADDSTAGE_DIR, filename).delete();
@@ -639,6 +654,7 @@ public class Repository {
             String headCommitID = readContentsAsString(branch); //提取分支指针指向的commit
             Commit commit = readObject(join(COMMIT_DIR, headCommitID), Commit.class);//从分支指向的commit提取commit对象
             //头指针指向分支指向的commit
+            System.out.println(commit.blobID);
 
             List<File> blobfiles = getBlobFileListFromCommit(commit);
             List<String> blobfileNames = new ArrayList<>();
@@ -649,7 +665,7 @@ public class Repository {
             }
 
             File testfile = join(CWD, "test");
-            File[] files = CWD.listFiles();
+            File[] files = testfile.listFiles();
             //findFileRecursivelyParent(CWD, "test");
 
 
@@ -668,7 +684,7 @@ public class Repository {
                 //System.out.println(file.getPath());
                 Blob blob = readObject(blobfile, Blob.class);
 
-                writeContents(join(CWD, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
+                writeContents(join(testfile, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
             }
             writeObject(currentBranch, branch);
             writeContents(HEAD_FILE, headCommitID);
@@ -701,27 +717,27 @@ public class Repository {
 
     public static boolean hasUntrackedFiles() {
 
-        File testfile = join(CWD, "test");
-        File[] workingFiles = CWD.listFiles();
-
-        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
-        //System.out.println(blobIDs);
-        if (blobIDs == null) {
-            return false;
-        }
-        for (File file : workingFiles) {
-            if (file.isFile()) {
-                String content = readContentsAsString(file);
-                String fileName = file.getName();
-                Blob blob = new Blob();
-                String blobID = blob.generatelID(content, fileName);
-                //System.out.println(fileName+" "+blobID);
-
-                if (!blobIDs.contains(blobID)) {
-                    return true;  // 发现未跟踪文件
-                }
-            }
-        }
+//        File testfile = join(CWD, "test");
+//        File[] workingFiles = testfile.listFiles();
+//
+//        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
+//        //System.out.println(blobIDs);
+//        if (blobIDs == null) {
+//            return false;
+//        }
+//        for (File file : workingFiles) {
+//            if (file.isFile()) {
+//                String content = readContentsAsString(file);
+//                String fileName = file.getName();
+//                Blob blob = new Blob();
+//                String blobID = blob.generatelID(content, fileName);
+//                //System.out.println(fileName+" "+blobID);
+//
+//                if (!blobIDs.contains(blobID)) {
+//                    return true;  // 发现未跟踪文件
+//                }
+//            }
+//        }
         return false;  // 没有未跟踪文件
     }
 
@@ -1105,31 +1121,41 @@ public class Repository {
                     FileStatus targetStatus = getFileStatus(givenBranchCommit, splitPointCommit, fileName);
                     FileStatus mergeBaseStatus = getFileStatus(splitPointCommit, splitPointCommit, fileName);
 
-                    //System.out.println("fileName: " + fileName);
+                    System.out.println("fileName: " + fileName);
+                    System.out.println("currentStatus: " + currentStatus);
+                    System.out.println("targetStatus: " + targetStatus);
+                    System.out.println("mergeBaseStatus: " + mergeBaseStatus);
 
                     if (One(currentStatus, targetStatus, mergeBaseStatus)) {
+                        System.out.println("1");
                         checkout4(givenBranchCommit, fileName);
                         add(fileName);
                     } else if (Two(currentStatus, targetStatus, mergeBaseStatus)) {
-
+                        System.out.println("2");
                     } else if (Three1(currentStatus, targetStatus, mergeBaseStatus)) {
+                        System.out.println("3");
                         if (currentStatus.getBlobId().equals(targetStatus.getBlobId())){
 
                         } else if (!currentStatus.getBlobId().equals(targetStatus.getBlobId())) {
                             resolveConflict(fileName, currentBranchCommit, givenBranchCommit);
                         }
                     }  else if (Four(currentStatus, targetStatus, mergeBaseStatus)) {
-
+                        System.out.println("4");
                     } else if (Five(currentStatus, targetStatus, mergeBaseStatus)) {
-                        checkout4(givenBranchCommit, fileName);
+                        System.out.println("5");
+                        checkout4(givenBranchCommit, fileName);  //p进这了, 没有成功添加到工作目录
                     } else if (Six(currentStatus, targetStatus, mergeBaseStatus)) {
+                        System.out.println("6");
                         String path =  findFileRecursively(CWD, fileName);
                         File file = new File(path);
                         file.delete();
                     } else if (Seven(currentStatus, targetStatus, mergeBaseStatus)) {
+                        System.out.println("7");
                         String path =  findFileRecursively(CWD, fileName);
-                        File file = new File(path);
-                        file.delete();
+                        if (path != null) {
+                            File file = new File(path);
+                            file.delete();
+                        }
                     }
 
                 }
@@ -1201,13 +1227,13 @@ public class Repository {
         }
     }
 
-    private static boolean Three2(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
-        if (currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isModified()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    private static boolean Three2(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+//        if (currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isModified()) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
     private static boolean Four(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
         if (currentStatus.exists() && !mergeBaseStatus.exists() && !targetStatus.exists()) {

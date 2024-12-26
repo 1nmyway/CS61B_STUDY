@@ -37,11 +37,11 @@ public class Commit implements Serializable {
     public String fileName;
     public Date currentDate;
     public Map<String,String> pathToBlobID ;
-    public List<String> blobID;
+    public ArrayList<String> blobID;
     static int num;
 
     public File branch;
-    private Map<String, String> fileMap;  // 文件到Blob的映射 (文件名 -> Blob ID)
+    public Map<String, String> fileMap;  // 文件到Blob的映射 (文件名 -> Blob ID)
 
 
     // 获取当前提交的文件树
@@ -63,7 +63,7 @@ public class Commit implements Serializable {
         this.pathToBlobID = pathToBlobID;
 
     }
-    Commit (String message, List<Commit> parents,Date currentDate,List<String> blobID ) {//用于生成hash id
+    Commit (String message, List<Commit> parents,Date currentDate,ArrayList<String> blobID ) {//用于生成hash id
         this.message = message;
         this.parents = parents;
         this.currentDate = currentDate;
@@ -80,7 +80,7 @@ public class Commit implements Serializable {
         this.fileName = fileName;
 
     }
-    Commit (String message, List<Commit> parents,String timestamp,List<String> blobID ,String ID,String author,String fileName, File branch,Map<String, String> fileMap) {
+    Commit (String message, List<Commit> parents,String timestamp,ArrayList<String> blobID ,String ID,String author,String fileName, File branch,Map<String, String> fileMap) {
         this.message = message;
         this.parents = parents;
         this.timestamp = timestamp;
