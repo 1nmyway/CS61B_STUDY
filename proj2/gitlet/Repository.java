@@ -166,6 +166,7 @@ public class Repository {
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents,fileName);//得到hash id
+            System.out.println(fileName+" "+hashBlobID);
             if (commit.blobID!=null) {
                 if (commit.blobID.contains(hashBlobID)) { //如果两次add的文件完全一致，则不添加
                     //System.out.println(commit.blobID+" "+hashBlobID+"666");
@@ -631,7 +632,7 @@ public class Repository {
         }
         else if(readObject(currentBranch,File.class).equals(branch)) {
             System.out.println("No need to checkout the current branch.");
-            return;
+
         } else {
             //System.out.println(hasUntrackedFiles());
             if (hasUntrackedFiles()){
@@ -650,7 +651,7 @@ public class Repository {
                 blobfileNames.add(blob.fileName);
             }
 
-            //File testfile = join(CWD, "test");
+            File testfile = join(CWD, "test");
             File[] files = CWD.listFiles();
             //findFileRecursivelyParent(CWD, "test");
 
@@ -703,10 +704,11 @@ public class Repository {
 
     public static boolean hasUntrackedFiles() {
 
-
+        File testfile = join(CWD, "test");
         File[] workingFiles = CWD.listFiles();
 
         List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
+        //System.out.println(blobIDs);
         if (blobIDs==null){
             return false;
         }
@@ -716,6 +718,8 @@ public class Repository {
                 String fileName = file.getName();
                 Blob blob = new Blob();
                 String blobID = blob.generatelID(content, fileName);
+                //System.out.println(fileName+" "+blobID);
+
                 if (!blobIDs.contains(blobID)) {
                     return true;  // 发现未跟踪文件
                 }
@@ -919,7 +923,9 @@ public class Repository {
 //        return false;
         }
     public static void checkout4(Commit commit,String fileName) { //把工作目录中的文件修改为commit里的
-            File f = new File(fileName);
+
+        String path = "./test"+"/"+fileName;
+        File f = new File(path);
             try {
                 f.createNewFile();
             } catch (IOException e) {
@@ -1005,8 +1011,9 @@ public class Repository {
         File givenBranchFile = join(HEADS_DIR, branchName);
         File currentBranchFile = readObject(currentBranch, File.class);
         List<String> stagedFiles = Utils.plainFilenamesIn(ADDSTAGE_DIR);
-        if (stagedFiles.isEmpty()){
+        if (!stagedFiles.isEmpty()){
             System.out.println("You have uncommitted changes.");
+            return;
         } else if (!givenBranchFile.exists()){
             System.out.println("A branch with that name does not exist.");
             return;
@@ -1017,7 +1024,7 @@ public class Repository {
             System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
             return;
         }
-
+        //System.out.println("dada");
         String currentBranchCommitID = readContentsAsString(currentBranchFile);
         Commit currentBranchCommit = readObject(join(COMMIT_DIR, currentBranchCommitID), Commit.class);
 
@@ -1026,7 +1033,7 @@ public class Repository {
         for (String blobID : currentBranchCommitBlobIDList){
             currentFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
         }
-
+        //System.out.println("currentFiles:"+currentFiles);
 // 合并这两个集合，得到所有需要合并的文件
         Set<String> allFilesInMerge = new HashSet<>();
 
@@ -1039,17 +1046,19 @@ public class Repository {
         for (String blobID : givenBranchCommitBlobIDList){
             targetFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
         }
-
+        //System.out.println("targetFiles:"+targetFiles);
         Commit splitPointCommit = findSplitPoint(currentBranchCommit, givenBranchCommit);
         List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
         Set<String> splitFiles = new HashSet<>();
         for (String blobID : splitPointCommitBlobIDList){
             splitFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
         }
+        //System.out.println("splitFiles:"+splitFiles);
 
         allFilesInMerge.addAll(splitFiles);
         allFilesInMerge.addAll(targetFiles);
         allFilesInMerge.addAll(currentFiles);
+        //System.out.println("dd"+splitPointCommit);
 
         if (splitPointCommit != null) {
             if (splitPointCommit.equals(givenBranchCommit)) {
@@ -1062,41 +1071,33 @@ public class Repository {
                     FileStatus targetStatus = getFileStatus(givenBranchCommit,splitPointCommit,fileName);
                     FileStatus mergeBaseStatus = getFileStatus(splitPointCommit,splitPointCommit,fileName);
 
+                    //System.out.println("fileName: " + fileName);
+
+
                     if (bothModified(currentStatus, targetStatus, mergeBaseStatus)) { // 冲突
+                        //System.out.println("1");
                         // 处理冲突
                         resolveConflict(fileName, currentBranchCommit, givenBranchCommit);//1
                     } else if (modifiedOnlyInCurrent(currentStatus, mergeBaseStatus)) {  //2 在master已修改但未在otehr修改的任何文件都应保持原样。
-                                                                                         //4 任何不存在于分割点且仅存在于当前分支中的文件都应保持原样
+                        //System.out.println("2");                                                    //4 任何不存在于分割点且仅存在于当前分支中的文件都应保持原样
                         // 保持当前分支的文件
                         //不做任何事
                     } //else if (bothDeleted(currentStatus, targetStatus)) {  //3 都删除不变
                     // 文件删除
                         //
                     else if (Five(currentStatus, targetStatus,mergeBaseStatus)){    //5 检出暂存
+                        //System.out.println("3");
                         checkout4(givenBranchCommit, fileName);
                         add(fileName);
+
                     }else if(Six(currentStatus, targetStatus,mergeBaseStatus)){    //6删除
+                        //System.out.println("4");
                         File file = new File(fileName);
                         file.delete();
                     }else if(Seven(currentStatus, targetStatus,mergeBaseStatus)){  //7  保持不存在
-
+                        //System.out.println("5");
                     }
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //                if (splitPointCommit!=null){
@@ -1161,7 +1162,7 @@ public class Repository {
         }
     }
 
-    public static Commit findSplitPoint(Commit currentBranchCommit,Commit givenBranchCommit){
+    public static Commit findSplitPoint2(Commit currentBranchCommit,Commit givenBranchCommit){
 
 
         Set<String> visited = new HashSet<>();  // 用来记录访问过的提交
@@ -1183,6 +1184,43 @@ public class Repository {
                 givenBranchCommit = givenBranchCommit.parents.get(0);  // 获取 commit2 的父提交
             }
         }
+        return null;
+    }
+    public static Commit findSplitPoint(Commit currentBranchCommit, Commit givenBranchCommit) {
+        // 参数校验
+        if (currentBranchCommit == null || givenBranchCommit == null) {
+            return null;
+        }
+
+        Set<String> visited = new HashSet<>();  // 用来记录访问过的提交
+
+        // 使用队列进行广度优先搜索，处理多父提交的情况
+        Queue<Commit> queue = new LinkedList<>();
+        queue.offer(currentBranchCommit);
+
+        while (!queue.isEmpty()) {
+            Commit commit = queue.poll();
+            if (commit != null) {
+                visited.add(commit.ID);
+                for (Commit parent : commit.parents) {
+                    queue.offer(parent);
+                }
+            }
+        }
+
+        // 回溯 givenBranchCommit 的历史，直到找到第一个共同的提交
+        while (givenBranchCommit != null) {
+            if (visited.contains(givenBranchCommit.ID)) {  // 如果 givenBranchCommit 的提交在 visited 中，说明找到了分割点
+                return givenBranchCommit;  // 返回共同的提交
+            }
+            for (Commit parent : givenBranchCommit.parents) {
+                givenBranchCommit = parent;
+                break;  // 只取第一个父提交，保持原逻辑不变
+            }
+        }
+
+        // 添加日志记录
+        System.out.println("No common ancestor found between the two branches.");
         return null;
     }
 }
