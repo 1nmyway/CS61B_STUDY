@@ -924,8 +924,8 @@ public class Repository {
         }
     public static void checkout4(Commit commit,String fileName) { //把工作目录中的文件修改为commit里的
 
-        String path = "./test"+"/"+fileName;
-        File f = new File(path);
+
+        File f = new File(fileName);
             try {
                 f.createNewFile();
             } catch (IOException e) {
