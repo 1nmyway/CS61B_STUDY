@@ -608,7 +608,7 @@ public class Repository {
     public static void checkout2(String ID,String fileName) {
         List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
         for(String commitfilesName : commitfilesNames){
-            if (commitfilesName.startsWith(ID)){
+            if (commitfilesName.substring(0,8).equals(ID)||commitfilesName.equals(ID)){
                 Commit commit = readObject(join(COMMIT_DIR, commitfilesName), Commit.class);
                 checkout(commit, fileName);
                 return;
@@ -834,20 +834,20 @@ public class Repository {
         }
     }
 
-    public static void deleteAllFilesExceptNameEqual(String fileName) {
-        // 获取工作目录中的所有文件和子目录
-        File[] files = CWD.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                String f = file.getName();
-                if (!f.equals(fileName)) {            //文件名相同的文件不删除
-                    //System.out.println("Deleting file: " + file.getName());
-                    file.delete();
-                }
-            }
-        }
-    }
+//    public static void deleteAllFilesExceptNameEqual(String fileName) {
+//        // 获取工作目录中的所有文件和子目录
+//        File[] files = CWD.listFiles();
+//
+//        if (files != null) {
+//            for (File file : files) {
+//                String f = file.getName();
+//                if (!f.equals(fileName)) {            //文件名相同的文件不删除
+//                    //System.out.println("Deleting file: " + file.getName());
+//                    file.delete();
+//                }
+//            }
+//        }
+//    }
     public static void deleteAllFiles(File dir) {
         // 获取工作目录中的所有文件和子目录
         File[] files = dir.listFiles();
@@ -860,5 +860,6 @@ public class Repository {
         }
 
     public static void merge(String branchName){
+
     }
 }

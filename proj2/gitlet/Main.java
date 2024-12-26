@@ -85,7 +85,7 @@ public class Main {
                 Repository.reset(args[1]);
                 break;
             case "merge":
-                Repository.rm(args[1]);
+                Repository.merge(args[1]);
                 break;
 
             default:
