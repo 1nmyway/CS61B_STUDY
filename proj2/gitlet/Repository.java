@@ -1123,10 +1123,12 @@ public class Repository {
                     } else if (Five(currentStatus, targetStatus, mergeBaseStatus)) {
                         checkout4(givenBranchCommit, fileName);
                     } else if (Six(currentStatus, targetStatus, mergeBaseStatus)) {
-                        File file = new File(fileName);
+                        String path =  findFileRecursively(CWD, fileName);
+                        File file = new File(path);
                         file.delete();
                     } else if (Seven(currentStatus, targetStatus, mergeBaseStatus)) {
-                        File file = new File(fileName);
+                        String path =  findFileRecursively(CWD, fileName);
+                        File file = new File(path);
                         file.delete();
                     }
 
