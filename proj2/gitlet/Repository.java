@@ -922,7 +922,7 @@ public class Repository {
 //        }
 //        return false;
         }
-    public static void checkout4(Commit commit,String fileName) { //把工作目录中的文件修改为commit里的
+    public static void checkout41(Commit commit,String fileName) { //把工作目录中的文件修改为commit里的
 
 
         File f = new File(fileName);
@@ -943,6 +943,40 @@ public class Repository {
                 //System.out.println("content:"+blob.fileContent);
                 //System.out.println("filename:"+blob.fileName);
             }
+        }
+    }
+
+    public static void checkout4(Commit commit, String fileName) {
+        // 获取工作目录中的文件
+        File f = new File(fileName);
+
+        // 如果文件不存在，则创建新文件
+        if (!f.exists()) {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to create file: " + fileName, e);
+            }
+        }
+
+        // 从 commit 中获取所有 Blob 文件
+        List<File> files = getBlobFileListFromCommit(commit);
+
+        // 查找与 fileName 匹配的 Blob 文件
+        boolean found = false;
+        for (File blobFile : files) {
+            Blob blob = readObject(blobFile, Blob.class);
+            if (blob != null && blob.fileName.equals(fileName)) {
+                // 将 Blob 的内容写入工作目录中的文件
+                writeContents(f, blob.fileContent);
+                found = true;
+                break; // 找到并写入文件后退出
+            }
+        }
+
+        // 如果没有找到匹配的 Blob 文件，打印错误信息
+        if (!found) {
+            System.out.println("File " + fileName + " not found in the commit.");
         }
     }
     public static boolean modifiedOnlyInCurrent(FileStatus currentStatus,FileStatus mergeBaseStatus){
