@@ -867,7 +867,7 @@ public class Repository {
 
 
         // 获取文件在某个提交中的状态
-        public static FileStatus getFileStatus(Commit commit, String fileName) {
+        public static FileStatus getFileStatus(Commit commit, Commit mergeBaseCommit, String fileName) {
             // 获取当前提交中的文件映射（文件名 -> Blob ID）
             Map<String, String> fileMap = commit.getFileMap();
 
@@ -879,27 +879,27 @@ public class Repository {
             // 获取文件的 Blob ID
             String currentBlobId = fileMap.get(fileName);
 
-            // 获取父提交的文件映射（如果有父提交）
-            Commit parentCommit = commit.parents.get(0);
-            if (parentCommit != null) {
-                Map<String, String> parentFileMap = parentCommit.getFileMap();
-                // 如果父提交中没有该文件，那么说明它是新增的
-                if (!parentFileMap.containsKey(fileName)) {
-                    return new FileStatus(true, false, false, currentBlobId); // 文件新增
-                }
+            // 获取分割点（merge base）提交的文件映射
+            Map<String, String> mergeBaseFileMap = mergeBaseCommit.getFileMap();
 
-                // 如果父提交中有该文件，检查它的 Blob ID 是否发生变化（文件是否修改）
-                String parentBlobId = parentFileMap.get(fileName);
-                if (!parentBlobId.equals(currentBlobId)) {
-                    return new FileStatus(true, true, false, currentBlobId); // 文件修改了
-                }
+            // 如果分割点中没有该文件，那么说明它是新增的
+            if (!mergeBaseFileMap.containsKey(fileName)) {
+                return new FileStatus(true, false, false, currentBlobId); // 文件是新增的
             }
 
-            // 如果文件在父提交中存在且没有发生变化，则认为文件没有修改
+            // 获取分割点中该文件的 Blob ID
+            String mergeBaseBlobId = mergeBaseFileMap.get(fileName);
+
+            // 如果当前提交中的 Blob ID 与分割点中的 Blob ID 不同，说明该文件在当前分支中被修改了
+            if (!mergeBaseBlobId.equals(currentBlobId)) {
+                return new FileStatus(true, true, false, currentBlobId); // 文件被修改了
+            }
+
+            // 如果当前提交中的 Blob ID 和分割点中的 Blob ID 相同，说明该文件在当前分支中没有修改
             return new FileStatus(true, false, false, currentBlobId); // 文件未修改
         }
 
-        public static boolean bothModified(FileStatus currentStatus,FileStatus targetStatus,FileStatus mergeBaseStatus){
+    public static boolean bothModified(FileStatus currentStatus,FileStatus targetStatus,FileStatus mergeBaseStatus){
                 // 空值检查
                 if (currentStatus == null || targetStatus == null) {
                     return false;
@@ -1029,9 +1029,9 @@ public class Repository {
                 System.out.println("Current branch fast-forwarded.");
             }else {
                 for (String fileName : allFilesInMerge) {
-                    FileStatus currentStatus = getFileStatus(currentBranchCommit, fileName);
-                    FileStatus targetStatus = getFileStatus(givenBranchCommit, fileName);
-                    FileStatus mergeBaseStatus = getFileStatus(splitPointCommit, fileName);
+                    FileStatus currentStatus = getFileStatus(currentBranchCommit,splitPointCommit,fileName);
+                    FileStatus targetStatus = getFileStatus(givenBranchCommit,splitPointCommit,fileName);
+                    FileStatus mergeBaseStatus = getFileStatus(splitPointCommit,splitPointCommit,fileName);
 
                     if (bothModified(currentStatus, targetStatus, mergeBaseStatus)) {
                         // 处理冲突
