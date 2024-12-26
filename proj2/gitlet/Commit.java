@@ -30,7 +30,7 @@ public class Commit implements Serializable {
 
     /** The message of this Commit. */
     public String message;
-    public List<String> parents;
+    public List<Commit> parents;
     public String author;
     public String timestamp;
     public String ID;
@@ -42,28 +42,28 @@ public class Commit implements Serializable {
 
     public File branch;
     Commit(){}
-    Commit (String message, List<String> parents,String timestamp,Map<String,String> pathToBlobID ) {
+    Commit (String message, List<Commit> parents,String timestamp,Map<String,String> pathToBlobID ) {
         this.message = message;
         this.parents = parents;
         this.timestamp = timestamp;
         this.pathToBlobID = pathToBlobID;
 
     }
-    Commit (String message, List<String> parents,Date currentDate,Map<String,String> pathToBlobID ) {//用于生成hash id
+    Commit (String message, List<Commit> parents,Date currentDate,Map<String,String> pathToBlobID ) {//用于生成hash id
         this.message = message;
         this.parents = parents;
         this.currentDate = currentDate;
         this.pathToBlobID = pathToBlobID;
 
     }
-    Commit (String message, List<String> parents,Date currentDate,List<String> blobID ) {//用于生成hash id
+    Commit (String message, List<Commit> parents,Date currentDate,List<String> blobID ) {//用于生成hash id
         this.message = message;
         this.parents = parents;
         this.currentDate = currentDate;
         this.blobID = blobID;
 
     }
-    Commit (String message, List<String> parents,String timestamp,Map<String,String> pathToBlobID ,String ID,String author,String fileName) {
+    Commit (String message, List<Commit> parents,String timestamp,Map<String,String> pathToBlobID ,String ID,String author,String fileName) {
         this.message = message;
         this.parents = parents;
         this.timestamp = timestamp;
@@ -73,7 +73,7 @@ public class Commit implements Serializable {
         this.fileName = fileName;
 
     }
-    Commit (String message, List<String> parents,String timestamp,List<String> blobID ,String ID,String author,String fileName, File branch) {
+    Commit (String message, List<Commit> parents,String timestamp,List<String> blobID ,String ID,String author,String fileName, File branch) {
         this.message = message;
         this.parents = parents;
         this.timestamp = timestamp;

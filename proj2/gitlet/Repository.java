@@ -222,8 +222,8 @@ public class Repository {
 
     public static void commit(String message) {
         Date date = new Date();
-        ArrayList<String> parents = new ArrayList<>();
-        parents.add(readContentsAsString(Repository.HEAD_FILE));//把头指针中指向的commit文件加为父提交
+        ArrayList<Commit> parents = new ArrayList<>();
+        parents.add(readObject(join(COMMIT_DIR, readContentsAsString(Repository.HEAD_FILE)), Commit.class));//把头指针中指向的commit文件加为父提交
         //TreeMap<String, String> blobMap = new TreeMap<>();
         List<String> blobIDList = new ArrayList<>();
         //String addstagePath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/addstage";
@@ -466,8 +466,9 @@ public class Repository {
             System.out.println(commit.message);
             System.out.print("\n");
             try {
-                File f2 = join(COMMIT_DIR, commit.parents.get(0));
-                commit = readObject(f2, Commit.class);
+//                File f2 = join(COMMIT_DIR, commit.parents.get(0));
+//                commit = readObject(f2, Commit.class);
+                commit = commit.parents.get(0);
             } catch (IndexOutOfBoundsException e) {
                 break;
             }
@@ -888,7 +889,9 @@ public class Repository {
         // 回溯 commit1 的历史，直到找不到父提交
         while (currentBranchCommit != null) {
             visited.add(currentBranchCommit.ID);  // 记录 commit1 的所有历史提交
-            currentBranchCommit = readObject(join(COMMIT_DIR, currentBranchCommit.parents.get(0)), Commit.class);  // 获取 commit1 的父提交
+            if (!currentBranchCommit.parents.isEmpty()) {
+                currentBranchCommit = currentBranchCommit.parents.get(0);  // 获取 commit1 的父提交
+            }
         }
 
         // 回溯 commit2 的历史，直到找到第一个共同的提交
@@ -896,7 +899,9 @@ public class Repository {
             if (visited.contains(givenBranchCommit.ID)) {  // 如果 commit2 的提交在 visited 中，说明找到了分割点
                 return givenBranchCommit;  // 返回共同的提交
             }
-            givenBranchCommit = readObject(join(COMMIT_DIR, givenBranchCommit.parents.get(0)), Commit.class);  // 获取 commit2 的父提交
+            if (!givenBranchCommit.parents.isEmpty()) {
+                givenBranchCommit = givenBranchCommit.parents.get(0);  // 获取 commit2 的父提交
+            }
         }
         return null;
     }
