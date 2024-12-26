@@ -524,7 +524,11 @@ public class Repository {
         List<String> branchNames = Utils.plainFilenamesIn(HEADS_DIR);
         for (int i = 0; i < branchNames.size(); i++) {
             String fileName = branchNames.get(i);
-            System.out.println("*" + fileName);
+            if (readObject(currentBranch,File.class).getName().equals(fileName)) {
+                System.out.println("*" + fileName);
+            }else {
+                System.out.println(fileName);
+            }
         }
         System.out.print("\n");
         System.out.println("=== Staged Files ===");
