@@ -41,6 +41,13 @@ public class Commit implements Serializable {
     static int num;
 
     public File branch;
+    private Map<String, String> fileMap;  // 文件到Blob的映射 (文件名 -> Blob ID)
+
+
+    // 获取当前提交的文件树
+    public Map<String, String> getFileMap() {
+        return fileMap;
+    }
     Commit(){}
     Commit (String message, List<Commit> parents,String timestamp,Map<String,String> pathToBlobID ) {
         this.message = message;
@@ -73,7 +80,7 @@ public class Commit implements Serializable {
         this.fileName = fileName;
 
     }
-    Commit (String message, List<Commit> parents,String timestamp,List<String> blobID ,String ID,String author,String fileName, File branch) {
+    Commit (String message, List<Commit> parents,String timestamp,List<String> blobID ,String ID,String author,String fileName, File branch,Map<String, String> fileMap) {
         this.message = message;
         this.parents = parents;
         this.timestamp = timestamp;
@@ -82,6 +89,7 @@ public class Commit implements Serializable {
         this.author = author;
         this.fileName = fileName;
         this.branch = branch;
+        this.fileMap = fileMap;
 
     }
 
