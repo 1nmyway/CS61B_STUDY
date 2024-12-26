@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFileAttributes;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -957,12 +958,12 @@ public class Repository {
         return false;
     }
 
-    public static boolean targetHasFileButNotInCurrent(FileStatus currentStatus,FileStatus targetStatus){
-        if (!currentStatus.exists() && targetStatus.exists()){
-            return true;
-        }
-        return false;
-    }
+//    public static boolean targetHasFileButNotInCurrent(FileStatus currentStatus,FileStatus targetStatus){
+//        if (!currentStatus.exists() && targetStatus.exists()){
+//            return true;
+//        }
+//        return false;
+//    }
 
     public static void resolveConflict(String fileName, Commit currentCommit, Commit targetCommit) {
         String currentContent = getFileContent(currentCommit, fileName);
@@ -1063,21 +1064,22 @@ public class Repository {
 
                     if (bothModified(currentStatus, targetStatus, mergeBaseStatus)) { // 冲突
                         // 处理冲突
-                        resolveConflict(fileName, currentBranchCommit, givenBranchCommit);
-                    } else if (modifiedOnlyInCurrent(currentStatus, mergeBaseStatus)) {
+                        resolveConflict(fileName, currentBranchCommit, givenBranchCommit);//1
+                    } else if (modifiedOnlyInCurrent(currentStatus, mergeBaseStatus)) {  //2 在master已修改但未在otehr修改的任何文件都应保持原样。
+                                                                                         //4 任何不存在于分割点且仅存在于当前分支中的文件都应保持原样
                         // 保持当前分支的文件
                         //不做任何事
-                    } else if (modifiedOnlyInTarget(targetStatus, mergeBaseStatus)) {
-                        // 更新为目标分支的文件
-                        checkout(givenBranchCommit, fileName);
-                    } else if (bothDeleted(currentStatus, targetStatus)) {
-                        // 文件删除
-                        File file = new File(fileName);
-                        if (file.exists()) {
-                            file.delete();
-                        }
-                    }else if(targetHasFileButNotInCurrent(currentStatus, targetStatus)){
+                    } //else if (bothDeleted(currentStatus, targetStatus)) {  //3 都删除不变
+                    // 文件删除
+                        //
+                    else if (Five(currentStatus, targetStatus,mergeBaseStatus)){    //5 检出暂存
                         checkout4(givenBranchCommit, fileName);
+                        add(fileName);
+                    }else if(Six(currentStatus, targetStatus,mergeBaseStatus)){    //6删除
+                        File file = new File(fileName);
+                        file.delete();
+                    }else if(Seven(currentStatus, targetStatus,mergeBaseStatus)){  //7  保持不存在
+
                     }
                 }
 
@@ -1129,6 +1131,33 @@ public class Repository {
 //                    }
 //                }
             }
+        }
+    }
+
+//    private static boolean Four(FileStatus currentStatus,FileStatus targetStatus, FileStatus mergeBaseStatus) {
+//    }
+
+    private static boolean Seven(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (!currentStatus.exists() && !targetStatus.isModified() && mergeBaseStatus.exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean Six(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (!currentStatus.isModified() && !targetStatus.exists() && mergeBaseStatus.exists()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean Five(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if (!currentStatus.exists() && targetStatus.exists() && !mergeBaseStatus.exists()) {
+            return true;
+        } else {
+            return false;
         }
     }
 
