@@ -237,10 +237,14 @@ public class Repository {
         List<String> stagefileNames = Utils.plainFilenamesIn(ADDSTAGE_DIR);//从addstage暂存区中提取所有的文件名
         List<String> removeFileNames = Utils.plainFilenamesIn(REMOVESATGE_DIR);//从removestage暂存区中提取所有的文件名
         //System.out.println(is_changed);
-        if (stagefileNames.isEmpty()&&removeFileNames.isEmpty()) {
+
+        assert stagefileNames != null;
+        assert removeFileNames != null;
+        if (stagefileNames.isEmpty() && removeFileNames.isEmpty()) {
             System.out.println("No changes added to the commit.");
             return;
         }
+
         deleteAllFiles(REMOVESATGE_DIR); //清空removestage
 
                                          //addstage中文件 文件名p.txt 内容 hash blobid
@@ -249,21 +253,52 @@ public class Repository {
         Commit headcommit=getCommitFromHead();//先把headcommit里的所有blob id加进来，除了addstage里有的
         List<String> headCommitblobIDList = headcommit.blobID;
         List<String> removeFileNameList = Utils.plainFilenamesIn(REMOVESATGE_DIR);
-        if (headCommitblobIDList!=null) {
-            for (String headCommitblobID : headCommitblobIDList) {
-                for (int i = 0; i < stagefileNames.size(); i++) {
-                    //System.out.println(readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName+" "+fileNames.get(i));
-                    for (int j=0;j<removeFileNameList.size();j++) {
-                        if (!readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName.equals(stagefileNames.get(i))
-                                && !readContentsAsString(join(REMOVESATGE_DIR,removeFileNameList.get(j))).equals(headCommitblobID)) {
-                            blobIDList.add(headCommitblobID);
-                            //System.out.println(headCommitblobID);
-                            //System.out.println(headCommitblobID);
+
+        if (headCommitblobIDList != null) {
+            headCommitblobIDList.stream()
+                    .filter(headCommitblobID -> {
+                        try {
+                            Blob blob = readObject(join(BLOB_DIR, headCommitblobID), Blob.class);
+                            boolean shouldAdd = !stagefileNames.contains(blob.fileName);
+
+                            if (shouldAdd) {
+                                shouldAdd = removeFileNameList.stream()
+                                        .noneMatch(removeFileName -> readContentsAsString(join(REMOVESATGE_DIR, removeFileName)).equals(headCommitblobID));
+                            }
+
+                            return shouldAdd;
+                        } catch (Exception e) {
+                            // 处理异常，例如记录日志
+                            System.err.println("Error processing headCommitblobID: " + headCommitblobID + ", error: " + e.getMessage());
+                            return false;
                         }
-                    }
-                }
-            }
+                    })
+                    .forEach(blobIDList::add);
         }
+
+
+
+//        if (headCommitblobIDList!=null) {
+//            for (String headCommitblobID : headCommitblobIDList) {
+//                for (int i = 0; i < stagefileNames.size(); i++) {
+//                    //System.out.println(readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName+" "+fileNames.get(i));
+//                    for (int j=0;j<removeFileNameList.size();j++) {
+//                        if (!readObject(join(BLOB_DIR, headCommitblobID), Blob.class).fileName.equals(stagefileNames.get(i))
+//                                && !readContentsAsString(join(REMOVESATGE_DIR,removeFileNameList.get(j))).equals(headCommitblobID)) {
+//                            blobIDList.add(headCommitblobID);
+//                            //System.out.println(headCommitblobID);
+//                            //System.out.println(headCommitblobID);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+//        assert headCommitblobIDList != null;
+//        headCommitblobIDList.stream().filter()
+
+
+
 
         if (!stagefileNames.isEmpty()) {
             for (int i = 0; i < stagefileNames.size(); i++) {       //再把addstage里存在的blob id加进来
@@ -280,8 +315,6 @@ public class Repository {
             }
         }
         //List<String> blobFileNames = Utils.plainFilenamesIn(BLOB_DIR);
-
-
         Commit commit = new Commit(message, parents, date, blobIDList);//创建新的commit,作用是生成hashid
         String commitHashID = commit.generatelID();
 
@@ -295,12 +328,7 @@ public class Repository {
         writeObject(f2, commit2);
         writeContents(Repository.HEAD_FILE, commitHashID);//把头指针指向commit
         //writeContents(readObject(currentBranch,File.class), commitHashID);//当前分支指向head//TODO
-
         writeContents(readObject(currentBranch, File.class), commitHashID); //当前分支指向head
-
-
-
-
         List<String> branchNames = new ArrayList<>(plainFilenamesIn(HEADS_DIR));
         branchNames.remove("master");
 
@@ -737,20 +765,62 @@ public class Repository {
     }
 
     public static void reset(String commitID){
+        int i =0;
     List<String> commitfilesNames = plainFilenamesIn(COMMIT_DIR);
-    if (!commitfilesNames.contains(commitID)){
+    Commit commit = null;
+    for (String commitfileName : commitfilesNames) {
+        if (commitfileName.equals(commitID)||commitfileName.substring(0,8).equals(commitID)) {
+             commit = readObject(join(COMMIT_DIR, commitfileName), Commit.class);
+            writeContents(HEAD_FILE, commitfileName);
+            i=1;
+        }
+    }
+    if (i==0){
         System.out.println("No commit with that id exists.");
         return;
     }
-
-    Commit commit = readObject(join(COMMIT_DIR, commitID), Commit.class);
-        List<String> blobIDList = commit.blobID;
-        for (String blobID : blobIDList){
-            //File f2 = join(BLOB_DIR, blobID);
-            //Blob blob=readObject(f2, Blob.class);
-            deleteAllFilesExceptTracked(blobID);
+                                                                                //提取分支指针指向的commit
+        //从分支指向的commit提取commit对象
+        //头指针指向分支指向的commi
+        List<File> blobfiles = getBlobFileListFromCommit(commit);
+        List<String> blobfileNames = new ArrayList<String>();
+        for (File file5 : blobfiles){
+            Blob blob = readObject(file5, Blob.class);
+            blobfileNames.add(blob.fileName);
         }
-        writeContents(currentBranch, commitID);
+
+        //File testfile = join(CWD, "test");
+        File[] files = CWD.listFiles();
+        //findFileRecursivelyParent(CWD, "test");
+
+        if (files != null) {
+            for (File file : files) {
+                String f = file.getName(); //工作目录中的文件
+                if (!blobfileNames.contains(f)){
+                    file.delete();
+                }
+            }
+        }
+        for (File blobfile : blobfiles) {
+            //System.out.println(file.getPath());
+            Blob blob = readObject(blobfile, Blob.class);
+
+            writeContents(join(CWD, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
+        }
+        //writeObject(currentBranch, branch);
+        //writeContents(HEAD_FILE, headCommitID);
+
+
+
+
+//    Commit commit = readObject(join(COMMIT_DIR, commitID), Commit.class);
+//        List<String> blobIDList = commit.blobID;
+//        for (String blobID : blobIDList){
+//            //File f2 = join(BLOB_DIR, blobID);
+//            //Blob blob=readObject(f2, Blob.class);
+//            deleteAllFilesExceptTracked(blobID);
+//        }
+//        writeContents(currentBranch, commitID);
     }
     public static void deleteAllFilesExceptTracked(String blobID) {
         // 获取工作目录中的所有文件和子目录
