@@ -478,6 +478,9 @@ public class Repository {
         while (!commit.ID.equals(" ")) {
             System.out.println("===");
             System.out.println("commit " + commit.ID);
+            if( commit.parents.size() > 1){
+                System.out.println("Merge: " + commit.parents.get(0).ID.substring(0,7) + " " + commit.parents.get(1).ID.substring(0,7));
+            }
             System.out.println("Date: " + commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
@@ -1104,6 +1107,12 @@ public class Repository {
             splitFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
         }
         //System.out.println("splitFiles:"+splitFiles);
+
+        currentBranchCommit.parents.add(givenBranchCommit);
+        Commit commit2 = new Commit(currentBranchCommit.message, currentBranchCommit.parents, currentBranchCommit.timestamp, currentBranchCommit.blobID, currentBranchCommit.ID, "", currentBranchCommit.ID, currentBranchCommit.branch, currentBranchCommit.fileMap);//填入所有commit信息
+        File f2 = join(COMMIT_DIR, currentBranchCommitID);//commit的文件名使用hash id
+
+        writeObject(f2, commit2);
 
         allFilesInMerge.addAll(splitFiles);
         allFilesInMerge.addAll(targetFiles);
