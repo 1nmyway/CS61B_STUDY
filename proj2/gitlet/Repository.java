@@ -461,7 +461,7 @@ public class Repository {
         Commit commit = readObject(f, Commit.class);
         while (!commit.ID.equals(" ")) {
             System.out.println("===");
-            System.out.println("commit "+commit.ID.substring(0,8));
+            System.out.println("commit "+commit.ID);
             System.out.println("Date: "+commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
@@ -486,7 +486,7 @@ public class Repository {
             File f = join(COMMIT_DIR, fileName);
             Commit commit = readObject(f, Commit.class);
             System.out.println("===");
-            System.out.println("commit "+commit);
+            System.out.println("commit "+commit.ID);
             System.out.println("Date: "+commit.timestamp);
             System.out.println(commit.message);
             //System.out.println(commit.parents);
