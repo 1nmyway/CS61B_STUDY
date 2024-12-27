@@ -963,16 +963,20 @@ public class Repository {
         Map<String, String> mergeBaseFileMap = mergeBaseCommit.getFileMap();
 
         // 如果分割点中没有该文件，那么说明它是新增的
-        if (!mergeBaseFileMap.containsKey(fileName)) {
-            return new FileStatus(true, false, false, currentBlobId); // 文件是新增的
-        }
+        if (mergeBaseFileMap!=null) {
+            if (!mergeBaseFileMap.containsKey(fileName)) {
+                return new FileStatus(true, false, false, currentBlobId); // 文件是新增的
+            }
 
-        // 获取分割点中该文件的 Blob ID
-        String mergeBaseBlobId = mergeBaseFileMap.get(fileName);
 
-        // 如果当前提交中的 Blob ID 与分割点中的 Blob ID 不同，说明该文件在当前分支中被修改了
-        if (!mergeBaseBlobId.equals(currentBlobId)) {
-            return new FileStatus(true, true, false, currentBlobId); // 文件被修改了
+            // 获取分割点中该文件的 Blob ID
+            String mergeBaseBlobId = mergeBaseFileMap.get(fileName);
+
+
+            // 如果当前提交中的 Blob ID 与分割点中的 Blob ID 不同，说明该文件在当前分支中被修改了
+            if (!mergeBaseBlobId.equals(currentBlobId)) {
+                return new FileStatus(true, true, false, currentBlobId); // 文件被修改了
+            }
         }
 
         // 如果当前提交中的 Blob ID 和分割点中的 Blob ID 相同，说明该文件在当前分支中没有修改
