@@ -644,7 +644,7 @@ public class Repository {
         System.out.println("=== Untracked Files ===");
         List<String> untrackedFilesNames = hasUntrackedFilesName();
         if (untrackedFilesNames != null) {
-            for (int i = 0; i < deletedfileNames.size(); i++) {
+            for (int i = 0; i < untrackedFilesNames.size(); i++) {
                 String fileName = untrackedFilesNames.get(i);
                 System.out.println(fileName);
             }
