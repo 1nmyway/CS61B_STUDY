@@ -175,7 +175,7 @@ public class Repository {
             //System.out.println(fileName+" "+hashBlobID);
             if (commit.blobID != null) {
                 if (commit.blobID.contains(hashBlobID)) { //如果两次add的文件完全一致，则不添加
-                    System.out.println(commit.blobID+" "+hashBlobID+"666");
+                    //System.out.println(commit.blobID+" "+hashBlobID+"666");
                     return;
                 }
             }
@@ -1306,23 +1306,23 @@ public class Repository {
                     FileStatus targetStatus = getFileStatus(givenBranchCommit, splitPointCommit, fileName);
                     FileStatus mergeBaseStatus = getFileStatus(splitPointCommit, splitPointCommit, fileName);
 
-                    System.out.println("fileName: " + fileName);
-                    System.out.println("currentStatus: " + currentStatus.exists()+" "+currentStatus.isModified()+" "+currentStatus.isDeleted()+" "+currentStatus.getBlobId());
-                    System.out.println("targetStatus: " + targetStatus.exists()+" "+targetStatus.isModified()+" "+targetStatus.isDeleted()+" "+targetStatus.getBlobId());
-                    System.out.println("mergeBaseStatus: " + mergeBaseStatus.exists()+" "+mergeBaseStatus.isModified()+" "+mergeBaseStatus.isDeleted()+" "+mergeBaseStatus.getBlobId());
+//                    System.out.println("fileName: " + fileName);
+//                    System.out.println("currentStatus: " + currentStatus.exists()+" "+currentStatus.isModified()+" "+currentStatus.isDeleted()+" "+currentStatus.getBlobId());
+//                    System.out.println("targetStatus: " + targetStatus.exists()+" "+targetStatus.isModified()+" "+targetStatus.isDeleted()+" "+targetStatus.getBlobId());
+//                    System.out.println("mergeBaseStatus: " + mergeBaseStatus.exists()+" "+mergeBaseStatus.isModified()+" "+mergeBaseStatus.isDeleted()+" "+mergeBaseStatus.getBlobId());
 
                     if (One(currentStatus, targetStatus, mergeBaseStatus)) {
-                        System.out.println("1");
+                        //System.out.println("1");
                         checkout4(givenBranchCommit, fileName);
                         //add(fileName);
                         blobIDList.add(targetStatus.getBlobId());
                         fileMap.put(fileName, targetStatus.getBlobId());
                     } else if (Two(currentStatus, targetStatus, mergeBaseStatus)) {
-                        System.out.println("2");
+                        //System.out.println("2");
                         blobIDList.add(currentStatus.getBlobId());
                         fileMap.put(fileName, currentStatus.getBlobId());
                     } else if (Three1(currentStatus, targetStatus, mergeBaseStatus)) {
-                        System.out.println("3");
+                        //System.out.println("3");
                         if (currentStatus.getBlobId().equals(targetStatus.getBlobId())){
                             blobIDList.add(currentStatus.getBlobId());
                             fileMap.put(fileName, currentStatus.getBlobId());
@@ -1334,21 +1334,21 @@ public class Repository {
                     } else if (Four(currentStatus, targetStatus, mergeBaseStatus)) {
                         blobIDList.add(currentStatus.getBlobId());
                         fileMap.put(fileName, currentStatus.getBlobId());
-                        System.out.println("4");
+                        //System.out.println("4");
                     } else if (Five(currentStatus, targetStatus, mergeBaseStatus)) {
-                        System.out.println("5");
+                        //System.out.println("5");
                         checkout4(givenBranchCommit, fileName);  //p进这了,
                         blobIDList.add(targetStatus.getBlobId());
                         fileMap.put(fileName, targetStatus.getBlobId());
                     } else if (Six(currentStatus, targetStatus, mergeBaseStatus)) {
-                        System.out.println("6");
+                        //System.out.println("6");
                         String path =  findFileRecursively(CWD, fileName);
                         if (path != null) {
                             File file = new File(path);
                             file.delete();
                         };
                     } else if (Seven(currentStatus, targetStatus, mergeBaseStatus)) {
-                        System.out.println("7");
+                        //System.out.println("7");
                         String path =  findFileRecursively(CWD, fileName);
                         if (path != null) {
                             File file = new File(path);
