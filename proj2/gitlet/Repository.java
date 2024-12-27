@@ -493,7 +493,7 @@ public class Repository {
             }
         }
     }
-    public static void log() {
+    public static void log3() {
         String commitHashID = readContentsAsString(Repository.HEAD_FILE);
         File f = join(COMMIT_DIR, commitHashID);//头指针指向的commit
         Commit commit = readObject(f, Commit.class);
@@ -523,7 +523,7 @@ public class Repository {
         }
     }
 
-    public static void log3() {
+    public static void log() {
         // 获取当前分支的最新提交
         Commit currentCommit = getCommitFromHead();
         printCommitHistory(currentCommit, new HashSet<>());
