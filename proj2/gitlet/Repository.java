@@ -1216,6 +1216,9 @@ public class Repository {
     public static String getFileContent(Commit commit, String fileName) {
         // 这里返回的是文件在提交中的内容，可以通过 Blob ID 获取
         String blobID = commit.getFileMap().get(fileName);
+        if (blobID == null){
+            return "";
+        }
         File blobFile = join(BLOB_DIR, blobID);
         Blob blob = readObject(blobFile, Blob.class);
         return new String(blob.fileContent, StandardCharsets.UTF_8); // 假设 BlobManager 获取文件内容
