@@ -1120,6 +1120,8 @@ public class Repository {
             if (splitPointCommit.equals(givenBranchCommit)) {
                 System.out.println("Given branch is an ancestor of the current branch.");
             } else if (splitPointCommit.equals(currentBranchCommit)) {
+                writeContents(HEAD_FILE, givenBranchCommitID);
+                writeContents(readObject(currentBranch,File.class), givenBranchCommitID);
                 System.out.println("Current branch fast-forwarded.");
             } else {
                 ArrayList<String> blobIDList = new ArrayList<>();
@@ -1197,6 +1199,7 @@ public class Repository {
                 }
                 writeObject(f2, commit2);
                 writeContents(Repository.HEAD_FILE, commitHashID);
+                writeContents(readObject(currentBranch,File.class), commitHashID);
             }
         }
     }
