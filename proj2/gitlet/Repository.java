@@ -948,6 +948,10 @@ public class Repository {
 
     // 获取文件在某个提交中的状态
     public static FileStatus getFileStatus(Commit commit, Commit mergeBaseCommit, String fileName) {
+
+        if (commit.message.equals("initial commit")){
+            return new FileStatus(false, false, false, null);
+        }
         // 获取当前提交中的文件映射（文件名 -> Blob ID）
         Map<String, String> fileMap = commit.getFileMap();
 
