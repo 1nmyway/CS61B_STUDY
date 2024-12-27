@@ -1162,14 +1162,16 @@ public class Repository {
             targetFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
         }
         //System.out.println("targetFiles:"+targetFiles);
+        Set<String> splitFiles = new HashSet<>();
         Commit splitPointCommit = findSplitPoint(currentBranchCommit, givenBranchCommit);
+            if (splitPointCommit != null&&splitPointCommit.ID != null) {
+                List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
 
-            List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
-            Set<String> splitFiles = new HashSet<>();
-            if (!splitPointCommitBlobIDList.isEmpty()) {
                 for (String blobID : splitPointCommitBlobIDList) {
                     splitFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
                 }
+            }else{
+
             }
 
 
@@ -1344,7 +1346,7 @@ public class Repository {
         }
     }
 
-    private static boolean Three2(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+    private static boolean Three3(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
         if ((currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isDeleted())
                 ||(currentStatus.isDeleted() && !mergeBaseStatus.isModified() && targetStatus.isModified())) {
             return true;
@@ -1352,6 +1354,19 @@ public class Repository {
             return false;
         }
     }
+
+
+    private static boolean Three2(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        // 空值检查
+        if (currentStatus == null || targetStatus == null || mergeBaseStatus == null) {
+            throw new IllegalArgumentException("FileStatus parameters cannot be null");
+        }
+
+        // 简化布尔表达式
+        return (currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isDeleted()) ||
+                (currentStatus.isDeleted() && !mergeBaseStatus.isModified() && targetStatus.isModified());
+    }
+
 
     private static boolean Four(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
         if (currentStatus.exists() && !mergeBaseStatus.exists() && !targetStatus.exists()) {
