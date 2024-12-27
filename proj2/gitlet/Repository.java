@@ -1454,8 +1454,8 @@ public class Repository {
         }
 
         // 简化布尔表达式
-        return (currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isDeleted()) ||
-                (currentStatus.isDeleted() && !mergeBaseStatus.isModified() && targetStatus.isModified());
+        return (currentStatus.isModified() && !mergeBaseStatus.isModified() && !targetStatus.exists()) ||
+                (!currentStatus.exists() && !mergeBaseStatus.isModified() && targetStatus.isModified());
     }
 
 
