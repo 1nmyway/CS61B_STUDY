@@ -471,7 +471,7 @@ public class Repository {
         }
     }
 
-    public static void log() {
+    public static void log2() {
         String commitHashID = readContentsAsString(Repository.HEAD_FILE);
         File f = join(COMMIT_DIR, commitHashID);//头指针指向的commit
         Commit commit = readObject(f, Commit.class);
@@ -493,6 +493,37 @@ public class Repository {
             }
         }
     }
+
+    public static void log() {
+        // 获取当前分支的最新提交
+        Commit currentCommit = getCommitFromHead();
+        printCommitHistory(currentCommit, new HashSet<>());
+    }
+
+    private static void printCommitHistory(Commit commit, Set<String> visited) {
+        if (commit == null || visited.contains(commit.ID)) {
+            return;
+        }
+
+        // 标记当前提交为已访问
+        visited.add(commit.ID);
+
+        // 打印当前提交的信息
+        System.out.println("===");
+        System.out.println("commit " + commit.ID);
+        if (commit.parents.size() > 1) {
+            System.out.println("Merge: " + commit.parents.get(0).ID.substring(0, 7) + " " + commit.parents.get(1).ID.substring(0, 7));
+        }
+        System.out.println("Date: " + commit.timestamp);
+        System.out.println(commit.message);
+        System.out.println();
+
+        // 递归打印每个父提交的历史
+        for (Commit parent : commit.parents) {
+            printCommitHistory(parent, visited);
+        }
+    }
+
 
     //print the commit history of all commits
 
@@ -757,7 +788,8 @@ public class Repository {
             throw new RuntimeException(e);
         }
         String headCommitID = readContentsAsString(HEAD_FILE);
-        writeContents(newBranch, headCommitID);
+        //writeContents(newBranch, headCommitID);
+        writeContents(newBranch,readContentsAsString(readObject(currentBranch, File.class)));
     }
 
     public static void rm_branch(String branchName) {
