@@ -493,8 +493,37 @@ public class Repository {
             }
         }
     }
-
     public static void log() {
+        String commitHashID = readContentsAsString(Repository.HEAD_FILE);
+        File f = join(COMMIT_DIR, commitHashID);//头指针指向的commit
+        Commit commit = readObject(f, Commit.class);
+        while (!commit.ID.equals(" ")) {
+            System.out.println("===");
+            if( commit.parents.size() > 1){
+                System.out.println("commit " + commit.ID);
+                System.out.println("Merge: " + commit.parents.get(0).ID.substring(0,7) + " " + commit.parents.get(1).ID.substring(0,7));
+                System.out.println("Date: " + commit.timestamp);
+                System.out.println(commit.message);
+                System.out.print("\n");
+                return;
+            }
+            System.out.println("commit " + commit.ID);
+            System.out.println("Merge: " + commit.parents.get(0).ID.substring(0,7) + " " + commit.parents.get(1).ID.substring(0,7));
+            System.out.println("Date: " + commit.timestamp);
+            System.out.println(commit.message);
+            System.out.print("\n");
+
+            try {
+//                File f2 = join(COMMIT_DIR, commit.parents.get(0));
+//                commit = readObject(f2, Commit.class);
+                commit = commit.parents.get(0);
+            } catch (IndexOutOfBoundsException e) {
+                break;
+            }
+        }
+    }
+
+    public static void log3() {
         // 获取当前分支的最新提交
         Commit currentCommit = getCommitFromHead();
         printCommitHistory(currentCommit, new HashSet<>());
