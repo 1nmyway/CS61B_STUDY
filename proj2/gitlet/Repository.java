@@ -1163,11 +1163,18 @@ public class Repository {
         }
         //System.out.println("targetFiles:"+targetFiles);
         Commit splitPointCommit = findSplitPoint(currentBranchCommit, givenBranchCommit);
-        List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
-        Set<String> splitFiles = new HashSet<>();
-        for (String blobID : splitPointCommitBlobIDList) {
-            splitFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
-        }
+
+            List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
+            Set<String> splitFiles = new HashSet<>();
+            if (!splitPointCommitBlobIDList.isEmpty()) {
+                for (String blobID : splitPointCommitBlobIDList) {
+                    splitFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
+                }
+            }
+
+
+
+
         //System.out.println("splitFiles:"+splitFiles);
 
 
@@ -1183,8 +1190,12 @@ public class Repository {
             if (splitPointCommit.equals(givenBranchCommit)) {
                 System.out.println("Given branch is an ancestor of the current branch.");
             } else if (splitPointCommit.ID.equals(currentBranchCommit.ID)) {
-                writeContents(HEAD_FILE, givenBranchCommitID);
-                writeContents(readObject(currentBranch,File.class), givenBranchCommitID);
+
+                checkout3(branchName); //切换分支,当前分支会被改写为给定分支
+                writeContents(HEAD_FILE, givenBranchCommitID);  //头指针改为给定分支commit
+                writeContents(readObject(currentBranch,File.class), givenBranchCommitID);//当前分支指向给定分支commit
+                writeObject(currentBranch,currentBranchFile);//把当前分支
+
                 System.out.println("Current branch fast-forwarded.");
             } else {
                 ArrayList<String> blobIDList = new ArrayList<>();
@@ -1217,7 +1228,9 @@ public class Repository {
                         } else if (!currentStatus.getBlobId().equals(targetStatus.getBlobId())) {
                             resolveConflict(fileName, currentBranchCommit, givenBranchCommit);
                         }
-                    }  else if (Four(currentStatus, targetStatus, mergeBaseStatus)) {
+                    } else if (Three2(currentStatus, targetStatus, mergeBaseStatus)) {
+                        resolveConflict(fileName, currentBranchCommit, givenBranchCommit);
+                    } else if (Four(currentStatus, targetStatus, mergeBaseStatus)) {
                         blobIDList.add(currentStatus.getBlobId());
                         fileMap.put(fileName, currentStatus.getBlobId());
                         //System.out.println("4");
@@ -1331,13 +1344,14 @@ public class Repository {
         }
     }
 
-//    private static boolean Three2(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
-//        if (currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isModified()) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
+    private static boolean Three2(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
+        if ((currentStatus.isModified() && !mergeBaseStatus.isModified() && targetStatus.isDeleted())
+                ||(currentStatus.isDeleted() && !mergeBaseStatus.isModified() && targetStatus.isModified())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     private static boolean Four(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
         if (currentStatus.exists() && !mergeBaseStatus.exists() && !targetStatus.exists()) {
