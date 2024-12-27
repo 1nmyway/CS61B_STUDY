@@ -1164,14 +1164,12 @@ public class Repository {
         //System.out.println("targetFiles:"+targetFiles);
         Set<String> splitFiles = new HashSet<>();
         Commit splitPointCommit = findSplitPoint(currentBranchCommit, givenBranchCommit);
-            if (splitPointCommit != null&&splitPointCommit.ID != null) {
-                List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
 
+                List<String> splitPointCommitBlobIDList = splitPointCommit.blobID;
+            if (splitPointCommitBlobIDList != null) {
                 for (String blobID : splitPointCommitBlobIDList) {
                     splitFiles.add(readObject(join(BLOB_DIR, blobID), Blob.class).fileName);
                 }
-            }else{
-
             }
 
 
