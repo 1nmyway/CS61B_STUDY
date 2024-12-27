@@ -1430,7 +1430,7 @@ public class Repository {
     }
 
     private static boolean Two(FileStatus currentStatus, FileStatus targetStatus, FileStatus mergeBaseStatus) {
-        if (currentStatus.isModified() && !mergeBaseStatus.isModified() && !targetStatus.isModified()) {
+        if (currentStatus.isModified() && !mergeBaseStatus.isModified() && !targetStatus.isModified() && targetStatus.exists()) {
             return true;
         } else {
             return false;
