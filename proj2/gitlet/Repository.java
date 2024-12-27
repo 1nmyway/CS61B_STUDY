@@ -625,30 +625,30 @@ public class Repository {
         }
         System.out.print("\n");
         System.out.println("=== Modifications Not Staged For Commit ===");
-        List<String> modifileNames = modifedFile();
-        if (modifileNames != null) {
-            for (int i = 0; i < modifileNames.size(); i++) {
-                String fileName = modifileNames.get(i);
-                System.out.println(fileName);
-            }
-        }
-        List<String> deletedfileNames = deletedFile();
-        if (deletedfileNames != null) {
-            for (int i = 0; i < deletedfileNames.size(); i++) {
-                String fileName = deletedfileNames.get(i);
-                System.out.println(fileName);
-            }
-        }
+//        List<String> modifileNames = modifedFile();
+//        if (modifileNames != null) {
+//            for (int i = 0; i < modifileNames.size(); i++) {
+//                String fileName = modifileNames.get(i);
+//                System.out.println(fileName);
+//            }
+//        }
+//        List<String> deletedfileNames = deletedFile();
+//        if (deletedfileNames != null) {
+//            for (int i = 0; i < deletedfileNames.size(); i++) {
+//                String fileName = deletedfileNames.get(i);
+//                System.out.println(fileName);
+//            }
+//        }
 
         System.out.print("\n");
         System.out.println("=== Untracked Files ===");
-        List<String> untrackedFilesNames = hasUntrackedFilesName();
-        if (untrackedFilesNames != null) {
-            for (int i = 0; i < untrackedFilesNames.size(); i++) {
-                String fileName = untrackedFilesNames.get(i);
-                System.out.println(fileName);
-            }
-        }
+//        List<String> untrackedFilesNames = hasUntrackedFilesName();
+//        if (untrackedFilesNames != null) {
+//            for (int i = 0; i < untrackedFilesNames.size(); i++) {
+//                String fileName = untrackedFilesNames.get(i);
+//                System.out.println(fileName);
+//            }
+//        }
     }
     public static List<String> modifedFile() {
 
