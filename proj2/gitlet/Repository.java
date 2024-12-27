@@ -626,27 +626,34 @@ public class Repository {
         System.out.print("\n");
         System.out.println("=== Modifications Not Staged For Commit ===");
         List<String> modifileNames = modifedFile();
-        for (int i = 0; i < modifileNames.size(); i++) {
-            String fileName = modifileNames.get(i);
-            System.out.println(fileName);
+        if (modifileNames != null) {
+            for (int i = 0; i < modifileNames.size(); i++) {
+                String fileName = modifileNames.get(i);
+                System.out.println(fileName);
+            }
         }
         List<String> deletedfileNames = deletedFile();
-
-        for (int i = 0; i < deletedfileNames.size(); i++) {
-            String fileName = deletedfileNames.get(i);
-            System.out.println(fileName);
+        if (deletedfileNames != null) {
+            for (int i = 0; i < deletedfileNames.size(); i++) {
+                String fileName = deletedfileNames.get(i);
+                System.out.println(fileName);
+            }
         }
-        
+
         System.out.print("\n");
         System.out.println("=== Untracked Files ===");
         List<String> untrackedFilesNames = hasUntrackedFilesName();
-        for (int i = 0; i < deletedfileNames.size(); i++) {
-            String fileName = untrackedFilesNames.get(i);
-            System.out.println(fileName);
+        if (untrackedFilesNames != null) {
+            for (int i = 0; i < deletedfileNames.size(); i++) {
+                String fileName = untrackedFilesNames.get(i);
+                System.out.println(fileName);
+            }
         }
     }
     public static List<String> modifedFile() {
+
         Commit commit = getCommitFromHead();
+        if (commit == null||commit.blobID==null){return null;}
         Blob blob = new Blob();
         List<String> fileNames = Utils.plainFilenamesIn(CWD);
         List<String> modifileNames = new ArrayList<>();
@@ -666,10 +673,10 @@ public class Repository {
     }
     public static List<String> deletedFile() {
         Commit commit = getCommitFromHead();
+        if (commit == null||commit.fileMap==null){return null;}
         List<String> fileNames = Utils.plainFilenamesIn(CWD);
         Set<String> map = commit.fileMap.keySet();
-        String string = map.toString();
-        Set<String> result = new HashSet<>();
+
         assert fileNames != null;
         fileNames.forEach(map::remove);
 
