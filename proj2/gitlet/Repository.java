@@ -1196,6 +1196,7 @@ public class Repository {
                     throw new RuntimeException(e);
                 }
                 writeObject(f2, commit2);
+                writeContents(Repository.HEAD_FILE, commitHashID);
             }
         }
     }
