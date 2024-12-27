@@ -508,7 +508,7 @@ public class Repository {
                 return;
             }
             System.out.println("commit " + commit.ID);
-            System.out.println("Merge: " + commit.parents.get(0).ID.substring(0,7) + " " + commit.parents.get(1).ID.substring(0,7));
+            //System.out.println("Merge: " + commit.parents.get(0).ID.substring(0,7) + " " + commit.parents.get(1).ID.substring(0,7));
             System.out.println("Date: " + commit.timestamp);
             System.out.println(commit.message);
             System.out.print("\n");
