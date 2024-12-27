@@ -728,7 +728,7 @@ public class Repository {
             }
 
             File testfile = join(CWD, "test");
-            File[] files = CWD.listFiles();
+            File[] files = testfile.listFiles();
             //findFileRecursivelyParent(CWD, "test");
 
 
@@ -747,7 +747,7 @@ public class Repository {
                 //System.out.println(file.getPath());
                 Blob blob = readObject(blobfile, Blob.class);
 
-                writeContents(join(CWD, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
+                writeContents(join(testfile, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
             }
             writeObject(currentBranch, branch);
             writeContents(HEAD_FILE, headCommitID);
@@ -780,27 +780,27 @@ public class Repository {
 
     public static boolean hasUntrackedFiles() {
 
-        File testfile = join(CWD, "test");
-        File[] workingFiles = CWD.listFiles();
-
-        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
-        //System.out.println(blobIDs);
-        if (blobIDs == null) {
-            return false;
-        }
-        for (File file : workingFiles) {
-            if (file.isFile()) {
-                String content = readContentsAsString(file);
-                String fileName = file.getName();
-                Blob blob = new Blob();
-                String blobID = blob.generatelID(content, fileName);
-                //System.out.println(fileName+" "+blobID);
-
-                if (!blobIDs.contains(blobID)) {
-                    return true;  // 发现未跟踪文件
-                }
-            }
-        }
+//        File testfile = join(CWD, "test");
+//        File[] workingFiles = CWD.listFiles();
+//
+//        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
+//        //System.out.println(blobIDs);
+//        if (blobIDs == null) {
+//            return false;
+//        }
+//        for (File file : workingFiles) {
+//            if (file.isFile()) {
+//                String content = readContentsAsString(file);
+//                String fileName = file.getName();
+//                Blob blob = new Blob();
+//                String blobID = blob.generatelID(content, fileName);
+//                //System.out.println(fileName+" "+blobID);
+//
+//                if (!blobIDs.contains(blobID)) {
+//                    return true;  // 发现未跟踪文件
+//                }
+//            }
+//        }
         return false;  // 没有未跟踪文件
     }
 
@@ -1176,11 +1176,13 @@ public class Repository {
         allFilesInMerge.addAll(targetFiles);
         allFilesInMerge.addAll(currentFiles);
         //System.out.println("dd"+splitPointCommit);
+//        System.out.println("split " +splitPointCommit.ID);
+//        System.out.println("curr "+currentBranchCommit.ID);
 
         if (splitPointCommit != null) {
             if (splitPointCommit.equals(givenBranchCommit)) {
                 System.out.println("Given branch is an ancestor of the current branch.");
-            } else if (splitPointCommit.equals(currentBranchCommit)) {
+            } else if (splitPointCommit.ID.equals(currentBranchCommit.ID)) {
                 writeContents(HEAD_FILE, givenBranchCommitID);
                 writeContents(readObject(currentBranch,File.class), givenBranchCommitID);
                 System.out.println("Current branch fast-forwarded.");
