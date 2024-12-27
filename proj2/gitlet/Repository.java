@@ -728,7 +728,7 @@ public class Repository {
             }
 
             File testfile = join(CWD, "test");
-            File[] files = testfile.listFiles();
+            File[] files = CWD.listFiles();
             //findFileRecursivelyParent(CWD, "test");
 
 
@@ -747,7 +747,7 @@ public class Repository {
                 //System.out.println(file.getPath());
                 Blob blob = readObject(blobfile, Blob.class);
 
-                writeContents(join(testfile, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
+                writeContents(join(CWD, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
             }
             writeObject(currentBranch, branch);
             writeContents(HEAD_FILE, headCommitID);
@@ -780,27 +780,27 @@ public class Repository {
 
     public static boolean hasUntrackedFiles() {
 
-//        File testfile = join(CWD, "test");
-//        File[] workingFiles = CWD.listFiles();
-//
-//        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
-//        //System.out.println(blobIDs);
-//        if (blobIDs == null) {
-//            return false;
-//        }
-//        for (File file : workingFiles) {
-//            if (file.isFile()) {
-//                String content = readContentsAsString(file);
-//                String fileName = file.getName();
-//                Blob blob = new Blob();
-//                String blobID = blob.generatelID(content, fileName);
-//                //System.out.println(fileName+" "+blobID);
-//
-//                if (!blobIDs.contains(blobID)) {
-//                    return true;  // 发现未跟踪文件
-//                }
-//            }
-//        }
+        File testfile = join(CWD, "test");
+        File[] workingFiles = CWD.listFiles();
+
+        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
+        //System.out.println(blobIDs);
+        if (blobIDs == null) {
+            return false;
+        }
+        for (File file : workingFiles) {
+            if (file.isFile()) {
+                String content = readContentsAsString(file);
+                String fileName = file.getName();
+                Blob blob = new Blob();
+                String blobID = blob.generatelID(content, fileName);
+                //System.out.println(fileName+" "+blobID);
+
+                if (!blobIDs.contains(blobID)) {
+                    return true;  // 发现未跟踪文件
+                }
+            }
+        }
         return false;  // 没有未跟踪文件
     }
 
