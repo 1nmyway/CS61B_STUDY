@@ -1024,6 +1024,7 @@ public class Repository {
 //    }
 
     public static void resolveConflict(String fileName, Commit currentCommit, Commit targetCommit) {
+        System.out.println("Encountered a merge conflict.");
         String currentContent = getFileContent(currentCommit, fileName);
         String targetContent = getFileContent(targetCommit, fileName);
 
@@ -1108,11 +1109,7 @@ public class Repository {
         }
         //System.out.println("splitFiles:"+splitFiles);
 
-        currentBranchCommit.parents.add(givenBranchCommit);
-        Commit commit2 = new Commit(currentBranchCommit.message, currentBranchCommit.parents, currentBranchCommit.timestamp, currentBranchCommit.blobID, currentBranchCommit.ID, "", currentBranchCommit.ID, currentBranchCommit.branch, currentBranchCommit.fileMap);//填入所有commit信息
-        File f2 = join(COMMIT_DIR, currentBranchCommitID);//commit的文件名使用hash id
 
-        writeObject(f2, commit2);
 
         allFilesInMerge.addAll(splitFiles);
         allFilesInMerge.addAll(targetFiles);
@@ -1125,6 +1122,8 @@ public class Repository {
             } else if (splitPointCommit.equals(currentBranchCommit)) {
                 System.out.println("Current branch fast-forwarded.");
             } else {
+                ArrayList<String> blobIDList = new ArrayList<>();
+                Map<String, String> fileMap = new HashMap<>();
                 for (String fileName : allFilesInMerge) {
                     FileStatus currentStatus = getFileStatus(currentBranchCommit, splitPointCommit, fileName);
                     FileStatus targetStatus = getFileStatus(givenBranchCommit, splitPointCommit, fileName);
@@ -1138,26 +1137,37 @@ public class Repository {
                     if (One(currentStatus, targetStatus, mergeBaseStatus)) {
                         ////System.out.println("1");
                         checkout4(givenBranchCommit, fileName);
-                        add(fileName);
+                        //add(fileName);
+                        blobIDList.add(targetStatus.getBlobId());
+                        fileMap.put(fileName, targetStatus.getBlobId());
                     } else if (Two(currentStatus, targetStatus, mergeBaseStatus)) {
                         //System.out.println("2");
+                        blobIDList.add(currentStatus.getBlobId());
+                        fileMap.put(fileName, currentStatus.getBlobId());
                     } else if (Three1(currentStatus, targetStatus, mergeBaseStatus)) {
                         //System.out.println("3");
                         if (currentStatus.getBlobId().equals(targetStatus.getBlobId())){
-
+                            blobIDList.add(currentStatus.getBlobId());
+                            fileMap.put(fileName, currentStatus.getBlobId());
                         } else if (!currentStatus.getBlobId().equals(targetStatus.getBlobId())) {
                             resolveConflict(fileName, currentBranchCommit, givenBranchCommit);
                         }
                     }  else if (Four(currentStatus, targetStatus, mergeBaseStatus)) {
+                        blobIDList.add(currentStatus.getBlobId());
+                        fileMap.put(fileName, currentStatus.getBlobId());
                         //System.out.println("4");
                     } else if (Five(currentStatus, targetStatus, mergeBaseStatus)) {
                         //System.out.println("5");
-                        checkout4(givenBranchCommit, fileName);  //p进这了, 没有成功添加到工作目录
+                        checkout4(givenBranchCommit, fileName);  //p进这了,
+                        blobIDList.add(targetStatus.getBlobId());
+                        fileMap.put(fileName, targetStatus.getBlobId());
                     } else if (Six(currentStatus, targetStatus, mergeBaseStatus)) {
                         //System.out.println("6");
                         String path =  findFileRecursively(CWD, fileName);
-                        File file = new File(path);
-                        file.delete();
+                        if (path != null) {
+                            File file = new File(path);
+                            file.delete();
+                        };
                     } else if (Seven(currentStatus, targetStatus, mergeBaseStatus)) {
                         //System.out.println("7");
                         String path =  findFileRecursively(CWD, fileName);
@@ -1168,6 +1178,24 @@ public class Repository {
                     }
 
                 }
+
+
+                String currentBranchName = readObject(currentBranch,File.class).getName();
+                List<Commit> parents = new ArrayList<>();
+                parents.add(currentBranchCommit);
+                parents.add(givenBranchCommit);
+                Date date = new Date();
+                Commit commit = new Commit("Merged "+branchName+" into "+currentBranchName, parents, date, blobIDList);//创建新的commit,作用是生成hashid
+                String commitHashID = commit.generatelID();
+
+                Commit commit2 = new Commit("Merged "+branchName+" into "+currentBranchName, parents, Commit.dateToTimeStamp(date), blobIDList, commitHashID, "",commitHashID, currentBranchCommit.branch, fileMap);//填入所有commit信息
+                File f2 = join(COMMIT_DIR, commitHashID);//commit的文件名使用hash id
+                try {
+                    f2.createNewFile();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                writeObject(f2, commit2);
             }
         }
     }
