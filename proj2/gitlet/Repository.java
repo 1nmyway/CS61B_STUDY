@@ -1370,7 +1370,7 @@ public class Repository {
                 Commit commit = new Commit("Merged "+branchName+" into "+currentBranchName, parents, date, blobIDList);//创建新的commit,作用是生成hashid
                 String commitHashID = commit.generatelID();
 
-                Commit commit2 = new Commit("Merged "+branchName+" into "+currentBranchName, parents, Commit.dateToTimeStamp(date), blobIDList, commitHashID, "",commitHashID, currentBranchCommit.branch, fileMap);//填入所有commit信息
+                Commit commit2 = new Commit("Merged "+branchName+" into "+currentBranchName+".", parents, Commit.dateToTimeStamp(date), blobIDList, commitHashID, "",commitHashID, currentBranchCommit.branch, fileMap);//填入所有commit信息
                 File f2 = join(COMMIT_DIR, commitHashID);//commit的文件名使用hash id
                 try {
                     f2.createNewFile();
