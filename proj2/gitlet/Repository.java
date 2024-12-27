@@ -625,9 +625,58 @@ public class Repository {
         }
         System.out.print("\n");
         System.out.println("=== Modifications Not Staged For Commit ===");
+        List<String> modifileNames = modifedFile();
+        for (int i = 0; i < modifileNames.size(); i++) {
+            String fileName = modifileNames.get(i);
+            System.out.println(fileName);
+        }
+        List<String> deletedfileNames = deletedFile();
+
+        for (int i = 0; i < deletedfileNames.size(); i++) {
+            String fileName = deletedfileNames.get(i);
+            System.out.println(fileName);
+        }
+        
         System.out.print("\n");
         System.out.println("=== Untracked Files ===");
+        List<String> untrackedFilesNames = hasUntrackedFilesName();
+        for (int i = 0; i < deletedfileNames.size(); i++) {
+            String fileName = untrackedFilesNames.get(i);
+            System.out.println(fileName);
+        }
     }
+    public static List<String> modifedFile() {
+        Commit commit = getCommitFromHead();
+        Blob blob = new Blob();
+        List<String> fileNames = Utils.plainFilenamesIn(CWD);
+        List<String> modifileNames = new ArrayList<>();
+        for (String fileName : fileNames) {
+            String filePath = findFileRecursively(CWD, fileName);
+            if (filePath == null) {
+                continue;
+            }
+            File file = new File(filePath);
+            String fileContent = Utils.readContentsAsString(file);
+            String blobID = blob.generatelID(fileContent, fileName);
+            if (!commit.blobID.contains(blobID)) {
+                 modifileNames.add(fileName);
+            }
+        }
+        return modifileNames;
+    }
+    public static List<String> deletedFile() {
+        Commit commit = getCommitFromHead();
+        List<String> fileNames = Utils.plainFilenamesIn(CWD);
+        Set<String> map = commit.fileMap.keySet();
+        String string = map.toString();
+        Set<String> result = new HashSet<>();
+        assert fileNames != null;
+        fileNames.forEach(map::remove);
+
+        return fileNames;
+    }
+
+
 
     public static Commit getCommitFromHead() {
         String head = readContentsAsString(HEAD_FILE);
@@ -803,6 +852,35 @@ public class Repository {
         }
         return false;  // 没有未跟踪文件
     }
+
+    public static List<String> hasUntrackedFilesName() {
+
+        File testfile = join(CWD, "test");
+        File[] workingFiles = CWD.listFiles();
+
+        List<String> blobIDs = plainFilenamesIn(BLOB_DIR);
+        List<String> fileNames = new ArrayList<>();
+        //System.out.println(blobIDs);
+        if (blobIDs == null) {
+            return null;
+        }
+        for (File file : workingFiles) {
+            if (file.isFile()) {
+                String content = readContentsAsString(file);
+                String fileName = file.getName();
+                Blob blob = new Blob();
+                String blobID = blob.generatelID(content, fileName);
+                //System.out.println(fileName+" "+blobID);
+
+                if (!blobIDs.contains(blobID)) {
+                    fileNames.add(fileName);
+                     // 发现未跟踪文件
+                }
+            }
+        }
+        return fileNames;  // 没有未跟踪文件
+    }
+
 
 
     public static void branch(String branchName) {
