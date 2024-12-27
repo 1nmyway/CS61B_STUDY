@@ -1,7 +1,9 @@
 package gitlet;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -157,17 +159,23 @@ public class Repository {
         if (filePath == null) {
             System.out.println("File does not exist.");
         } else {
+
+            //System.out.println("Adding: " + filePath);
             File file = new File(filePath);
-            String contents = readContentsAsString(file);
+            //String a = readContentsAsString(file);
+            //System.out.println(a);
+            byte[] contents = readContents(file);
             String fileName = file.getName();
             Blob blob0 = new Blob();
             //System.out.println(filePath);
             //System.out.println("contens:"+contents);
             String hashBlobID = blob0.generatelID(contents, fileName);//得到hash id
+//            System.out.println(contents + " " + fileName);
+//            System.out.println(readContentsAsString(file));
             //System.out.println(fileName+" "+hashBlobID);
             if (commit.blobID != null) {
                 if (commit.blobID.contains(hashBlobID)) { //如果两次add的文件完全一致，则不添加
-                    //System.out.println(commit.blobID+" "+hashBlobID+"666");
+                    System.out.println(commit.blobID+" "+hashBlobID+"666");
                     return;
                 }
             }
@@ -373,7 +381,7 @@ public class Repository {
         }
         File file = new File(filePath);
         //System.out.println(filePath);
-        String contents = readContentsAsString(file);
+        byte[] contents = readContents(file);
         String workfileName = file.getName();
         Blob blob0 = new Blob();
         String hashBlobID = blob0.generatelID(contents, workfileName);//得到工作目录中文件的hash id
@@ -663,7 +671,7 @@ public class Repository {
                 continue;
             }
             File file = new File(filePath);
-            String fileContent = Utils.readContentsAsString(file);
+            byte[] fileContent = Utils.readContents(file);
             String blobID = blob.generatelID(fileContent, fileName);
             if (!commit.blobID.contains(blobID)) {
                  modifileNames.add(fileName);
@@ -720,7 +728,7 @@ public class Repository {
             //System.out.println(file.getPath());
             Blob blob = readObject(file, Blob.class);
             if (blob.fileName.equals(fileName)) {
-                writeContents(f, blob.fileContent);
+                writeContents(f, new String(blob.fileContent, StandardCharsets.UTF_8));
                 a = 1;
                 //System.out.println("content:"+blob.fileContent);
                 //System.out.println("filename:"+blob.fileName);
@@ -803,7 +811,7 @@ public class Repository {
                 //System.out.println(file.getPath());
                 Blob blob = readObject(blobfile, Blob.class);
 
-                writeContents(join(CWD, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
+                writeContents(join(CWD, blob.fileName), new String(blob.fileContent, StandardCharsets.UTF_8));//把当前分支中commit中的文件写入工作目录的同名文件
             }
             writeObject(currentBranch, branch);
             writeContents(HEAD_FILE, headCommitID);
@@ -846,7 +854,7 @@ public class Repository {
         }
         for (File file : workingFiles) {
             if (file.isFile()) {
-                String content = readContentsAsString(file);
+                byte[] content = readContents(file);
                 String fileName = file.getName();
                 Blob blob = new Blob();
                 String blobID = blob.generatelID(content, fileName);
@@ -873,7 +881,7 @@ public class Repository {
         }
         for (File file : workingFiles) {
             if (file.isFile()) {
-                String content = readContentsAsString(file);
+                byte[] content = readContents(file);
                 String fileName = file.getName();
                 Blob blob = new Blob();
                 String blobID = blob.generatelID(content, fileName);
@@ -971,7 +979,7 @@ public class Repository {
             //System.out.println(file.getPath());
             Blob blob = readObject(blobfile, Blob.class);
 
-            writeContents(join(CWD, blob.fileName), blob.fileContent);//把当前分支中commit中的文件写入工作目录的同名文件
+            writeContents(join(CWD, blob.fileName), new String(blob.fileContent, StandardCharsets.UTF_8));//把当前分支中commit中的文件写入工作目录的同名文件
         }
 
         //writeContents(HEAD_FILE, headCommitID);
@@ -993,7 +1001,7 @@ public class Repository {
 
         if (files != null) {
             for (File file : files) {
-                String c = readContentsAsString(file);
+                byte[] c = readContents(file);
                 String f = file.getName();
                 Blob blob = new Blob();
                 String fileblobID = blob.generatelID(c, f);
@@ -1108,7 +1116,7 @@ public class Repository {
             //System.out.println(file.getPath());
             Blob blob = readObject(file, Blob.class);
             if (blob.fileName.equals(fileName)) {
-                writeContents(f, blob.fileContent);
+                writeContents(f, new String(blob.fileContent, StandardCharsets.UTF_8));
                 //System.out.println("content:"+blob.fileContent);
                 //System.out.println("filename:"+blob.fileName);
             }
@@ -1137,7 +1145,7 @@ public class Repository {
             Blob blob = readObject(blobFile, Blob.class);
             if (blob != null && blob.fileName.equals(fileName)) {
                 // 将 Blob 的内容写入工作目录中的文件
-                writeContents(f, blob.fileContent);
+                writeContents(f, new String(blob.fileContent, StandardCharsets.UTF_8));
                 found = true;
                 break; // 找到并写入文件后退出
             }
@@ -1210,7 +1218,7 @@ public class Repository {
         String blobID = commit.getFileMap().get(fileName);
         File blobFile = join(BLOB_DIR, blobID);
         Blob blob = readObject(blobFile, Blob.class);
-        return blob.fileContent; // 假设 BlobManager 获取文件内容
+        return new String(blob.fileContent, StandardCharsets.UTF_8); // 假设 BlobManager 获取文件内容
     }
 
 
@@ -1298,23 +1306,23 @@ public class Repository {
                     FileStatus targetStatus = getFileStatus(givenBranchCommit, splitPointCommit, fileName);
                     FileStatus mergeBaseStatus = getFileStatus(splitPointCommit, splitPointCommit, fileName);
 
-//                    System.out.println("fileName: " + fileName);
-//                    System.out.println("currentStatus: " + currentStatus);
-//                    System.out.println("targetStatus: " + targetStatus);
-//                    System.out.println("mergeBaseStatus: " + mergeBaseStatus);
+                    System.out.println("fileName: " + fileName);
+                    System.out.println("currentStatus: " + currentStatus.exists()+" "+currentStatus.isModified()+" "+currentStatus.isDeleted()+" "+currentStatus.getBlobId());
+                    System.out.println("targetStatus: " + targetStatus.exists()+" "+targetStatus.isModified()+" "+targetStatus.isDeleted()+" "+targetStatus.getBlobId());
+                    System.out.println("mergeBaseStatus: " + mergeBaseStatus.exists()+" "+mergeBaseStatus.isModified()+" "+mergeBaseStatus.isDeleted()+" "+mergeBaseStatus.getBlobId());
 
                     if (One(currentStatus, targetStatus, mergeBaseStatus)) {
-                        ////System.out.println("1");
+                        System.out.println("1");
                         checkout4(givenBranchCommit, fileName);
                         //add(fileName);
                         blobIDList.add(targetStatus.getBlobId());
                         fileMap.put(fileName, targetStatus.getBlobId());
                     } else if (Two(currentStatus, targetStatus, mergeBaseStatus)) {
-                        //System.out.println("2");
+                        System.out.println("2");
                         blobIDList.add(currentStatus.getBlobId());
                         fileMap.put(fileName, currentStatus.getBlobId());
                     } else if (Three1(currentStatus, targetStatus, mergeBaseStatus)) {
-                        //System.out.println("3");
+                        System.out.println("3");
                         if (currentStatus.getBlobId().equals(targetStatus.getBlobId())){
                             blobIDList.add(currentStatus.getBlobId());
                             fileMap.put(fileName, currentStatus.getBlobId());
@@ -1326,21 +1334,21 @@ public class Repository {
                     } else if (Four(currentStatus, targetStatus, mergeBaseStatus)) {
                         blobIDList.add(currentStatus.getBlobId());
                         fileMap.put(fileName, currentStatus.getBlobId());
-                        //System.out.println("4");
+                        System.out.println("4");
                     } else if (Five(currentStatus, targetStatus, mergeBaseStatus)) {
-                        //System.out.println("5");
+                        System.out.println("5");
                         checkout4(givenBranchCommit, fileName);  //p进这了,
                         blobIDList.add(targetStatus.getBlobId());
                         fileMap.put(fileName, targetStatus.getBlobId());
                     } else if (Six(currentStatus, targetStatus, mergeBaseStatus)) {
-                        //System.out.println("6");
+                        System.out.println("6");
                         String path =  findFileRecursively(CWD, fileName);
                         if (path != null) {
                             File file = new File(path);
                             file.delete();
                         };
                     } else if (Seven(currentStatus, targetStatus, mergeBaseStatus)) {
-                        //System.out.println("7");
+                        System.out.println("7");
                         String path =  findFileRecursively(CWD, fileName);
                         if (path != null) {
                             File file = new File(path);
