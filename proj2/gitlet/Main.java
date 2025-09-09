@@ -87,6 +87,12 @@ public class Main {
             case "merge":
                 Repository.merge(args[1]);
                 break;
+            case "add-remote":
+                Repository.add_remote(args[1],args[2]);
+                break;
+            case "push":
+                Repository.push(args[1],args[2]);
+                break;
 
             default:
                 System.out.println("No command with that name exists.");

@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFileAttributes;
 import java.time.LocalDateTime;
 import java.util.*;
+import com.jcraft.jsch.*;
 
 import static gitlet.Utils.*;
 
@@ -48,6 +49,7 @@ public class Repository {
     public static final File ADDSTAGE_DIR = join(GITLET_DIR, "addstage");
     public static final File REMOVESATGE_DIR = join(GITLET_DIR, "removestage");
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
+    public static final File REMOTES_DIR = join(GITLET_DIR, "remotes");
 
     public static File currentBranch = join(REFS_DIR, "currentBranch");
     public static boolean is_changed;
@@ -62,6 +64,7 @@ public class Repository {
             BLOB_DIR.mkdir();
             REFS_DIR.mkdir();
             HEADS_DIR.mkdir();
+            REMOTES_DIR.mkdir();
             try {
                 MASTER_DIR.createNewFile();
             } catch (IOException e) {
@@ -790,31 +793,6 @@ public class Repository {
                 Blob blob = readObject(file5, Blob.class);
                 blobfileNames.add(blob.fileName);
             }
-
-            File testfile = join(CWD, "test");
-            File[] files = CWD.listFiles();
-            //findFileRecursivelyParent(CWD, "test");
-
-
-            if (files != null) {
-                for (File file : files) {
-                    String f = file.getName(); //工作目录中的文件
-                    if (!blobfileNames.contains(f)) {
-                        file.delete();
-                    }
-                }
-            }
-
-            //System.out.println(files);
-
-            for (File blobfile : blobfiles) {
-                //System.out.println(file.getPath());
-                Blob blob = readObject(blobfile, Blob.class);
-
-                writeContents(join(CWD, blob.fileName), new String(blob.fileContent, StandardCharsets.UTF_8));//把当前分支中commit中的文件写入工作目录的同名文件
-            }
-            writeObject(currentBranch, branch);
-            writeContents(HEAD_FILE, headCommitID);
             //更新当前分支指针
 //            if (commit.blobID!=null) {
 //                for (String fileName : commit.blobID) {  //从commit里拿blobid
@@ -1225,7 +1203,7 @@ public class Repository {
     }
 
 
-    public static void merge(String branchName) {
+    public static void merg(String branchName) {
         File givenBranchFile = join(HEADS_DIR, branchName);
         File currentBranchFile = readObject(currentBranch, File.class);
         List<String> stagedFiles = Utils.plainFilenamesIn(ADDSTAGE_DIR);
@@ -1401,7 +1379,7 @@ public class Repository {
                 Commit commit = queue.poll();
                 if (commit != null) {
                     visited.add(commit.ID);
-                    for (Commit parent : commit.parents) {
+                    for (Commit parent: commit.parents) {
                         queue.offer(parent);
                     }
                 }
@@ -1502,5 +1480,82 @@ public class Repository {
         }
     }
 
+    public static void add_remote(String remoteName, String remoteUrl) {
+        Remote remote = new Remote();
+        if (plainFilenamesIn(Repository.REMOTES_DIR).contains(remoteName)){
+            System.out.println("A remote with that name already exists.");
+        }else {
+            Map<String,String> remoteNameToUrl = new TreeMap<>();
+            remoteNameToUrl.put(remoteName,remoteUrl);
+            remote.setRemoteNameToUrl(remoteNameToUrl);
+            File f = join(Repository.REMOTES_DIR, remoteName);
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            writeObject(f, remote);
+        }
+        }
+        public static void push(String remoteName,String branchName) {
+            SFTPExample a= new SFTPExample();
+        if (!plainFilenamesIn(Repository.REMOTES_DIR).contains(remoteName)){
+            System.out.println("Remote directory does not exist.");
+        }else {
+            //Remote remote = readObject(join(Repository.REMOTES_DIR, remoteName), Remote.class);
+            //Map<String,String> remoteNameToUrl = remote.getRemoteNameToUrl();
+            //String remoteUrl = remoteNameToUrl.get(remoteName);
+//            File f2 = join(remoteUrl, "refs","heads",branchName);
+//            File f = join(remoteUrl, "HEAD");
+//            if (!f2.exists()){
+//                try {
+//                    f2.createNewFile();
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//                writeContents(f2,readContentsAsString(f));
+//                a.changeJSCH();
+//            }
 
+            String remoteBranchPath = "/home/root/gitlet-repo/.gitlet/refs/heads/"+branchName;
+            String commitID = a.readJSCH(remoteBranchPath);
+            Commit commit = getCommitFromHead();
+
+            if(hasSameCommit(commit,commitID)){
+                //writeContents(f2,commit.ID); //往远程仓库的分支中写头提交id
+                a.changeJSCH(remoteBranchPath,commit.ID);
+
+                String localCommitPath = "E:/CS61B/skeleton-sp21/proj2/.gitlet/objects/commit"+commit.ID;
+                String targetPath = "/home/root/gitlet-repo/.gitlet/objects/commit";
+
+                a.pushJSCH(targetPath,localCommitPath);
+            }else {
+                System.out.println("Please pull down remote changes before pushing.");
+            }
+
+        }
+        }
+    public static boolean hasSameCommit(Commit headCommit, String targetCommitID) {
+        // 创建一个队列（或栈）来遍历所有的父提交
+        List<Commit> toVisit = headCommit.parents;
+
+        // 遍历父提交列表
+        while (!toVisit.isEmpty()) {
+            Commit parent = toVisit.remove(0);  // 取出父提交
+
+            // 比较父提交的 ID 是否与目标提交的 ID 相同
+            if (parent.ID.equals(targetCommitID)) {
+                return true;  // 找到相同的提交，返回 true
+            }
+
+            // 如果父提交有父提交，加入待遍历列表
+            toVisit.addAll(parent.parents);
+        }
+
+        // 如果遍历完所有父提交都没有找到相同的提交，返回 false
+        return false;
     }
+
+
+
+}
