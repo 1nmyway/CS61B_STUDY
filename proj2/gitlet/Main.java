@@ -85,7 +85,7 @@ public class Main {
                 Repository.reset(args[1]);
                 break;
             case "merge":
-                Repository.merge(args[1]);
+                //Repository.merge(args[1]);
                 break;
             case "add-remote":
                 Repository.add_remote(args[1],args[2]);

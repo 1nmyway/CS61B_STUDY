@@ -1203,7 +1203,7 @@ public class Repository {
     }
 
 
-    public static void merg(String branchName) {
+    public static void merge(String branchName) {
         File givenBranchFile = join(HEADS_DIR, branchName);
         File currentBranchFile = readObject(currentBranch, File.class);
         List<String> stagedFiles = Utils.plainFilenamesIn(ADDSTAGE_DIR);
